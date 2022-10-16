@@ -29,8 +29,6 @@ const prismaClient = async function (req, res, next) {
   next()
 }
 
-
-
 app.use(prismaClient)
 
 app.use('/api', indexRouter);
