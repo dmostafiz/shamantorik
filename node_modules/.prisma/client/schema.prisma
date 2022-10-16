@@ -1,0 +1,138 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  email    String    @unique
+  username String?
+  fullname String?
+  avatar   String?
+  bio      String?
+  quote    String?
+  phoneNo  String?
+  isNew    Boolean   @default(true)
+  role     String    @default("user")
+  posts    Post[]
+  Comment  Comment[]
+
+  followerIds String[] @db.ObjectId
+  followers   User[]   @relation(name: "followers", fields: [followerIds], references: [id])
+
+  followingIds String[] @db.ObjectId
+  followings   User[]   @relation(name: "followers", fields: [followingIds], references: [id])
+
+  views AuthorView[]
+
+  postLikes Like[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Post {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String? @db.ObjectId
+
+  // normal, multiStep
+  postType String @default("normal")
+
+  // new, old
+  postStatus String @default("new")
+
+  part Int?
+
+  parentId String? @db.ObjectId
+  parent   Post?   @relation(name: "post", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  childs Post[] @relation("post")
+
+  title   String
+  content String
+  image   String?
+
+  images String[]
+
+  categories  Category[] @relation(fields: [categoryIDs], references: [id])
+  categoryIDs String[]   @db.ObjectId
+
+  // drafted, published
+  status String @default("drafted")
+
+  commentIds String    @db.ObjectId
+  comments   Comment[]
+
+  views PostView[]
+
+  likes Like[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name        String
+  description String?
+
+  postIDs String[] @db.ObjectId
+  posts   Post[]   @relation(fields: [postIDs], references: [id])
+}
+
+model Like {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  postId String @db.ObjectId
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String? @db.ObjectId
+}
+
+model Comment {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String? @db.ObjectId
+
+  postId String @db.ObjectId
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  parentId String?  @db.ObjectId
+  parent   Comment? @relation(name: "comment", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  childs Comment[] @relation("comment")
+
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PostView {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  postId String @db.ObjectId
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  ip    String
+  agent String
+}
+
+model AuthorView {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  ip    String
+  agent String
+}
