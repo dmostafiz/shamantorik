@@ -13,7 +13,7 @@ const { PrismaClient } = require('@prisma/client')
 var app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000'],
+  origin: ['http://localhost:3000', 'https://nogorshoily.vercel.app'],
   credentials: true,
 }))
 
