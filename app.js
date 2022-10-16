@@ -4,14 +4,18 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
-var indexRouter = require('./routes/index');
+
+// var indexRouter = require('./routes/index');
 require('dotenv')
 
 const { PrismaClient } = require('@prisma/client')
 
 var app = express();
 
-app.use(cors())
+app.use(cors({
+  origin: ['http://localhost:3000'],
+  credentials: true,
+}))
 
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
@@ -30,7 +34,9 @@ const prismaClient = async function (req, res, next) {
 
 app.use(prismaClient)
 
-app.use('/api', indexRouter);
+require('./routes')(app)
+
+// app.use('/api', indexRouter);
 
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
