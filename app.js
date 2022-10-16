@@ -9,7 +9,7 @@ const { PrismaClient } = require('@prisma/client')
 
 var indexRouter = require('./routes/index');
 
-const configure = require('dotenv')
+require('dotenv')
 
 var app = express();
 
@@ -39,5 +39,4 @@ app.use('/api', indexRouter);
 //   next(createError(404));
 // });
 
-// error handler
 module.exports = app;
