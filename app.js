@@ -4,12 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
+var indexRouter = require('./routes/index');
+require('dotenv')
 
 const { PrismaClient } = require('@prisma/client')
-
-var indexRouter = require('./routes/index');
-
-require('dotenv')
 
 var app = express();
 
