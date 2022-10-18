@@ -143,7 +143,6 @@ module.exports = {
             console.log('Social Signup Error! ', error.message)
             return res.status(500).send({ ok: false, msg: error.message })
         }
-
     },
 
     refereshToken: async (req, res) => {
