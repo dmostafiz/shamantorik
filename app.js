@@ -22,9 +22,9 @@ app.use(cors({
 // app.set('view engine', 'jade');
 
 app.use(logger('dev'));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const prismaClient = async function (req, res, next) {

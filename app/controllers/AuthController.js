@@ -90,22 +90,23 @@ module.exports = {
 
             console.log('Created user: ', createUser)
 
-            const accessToken = jwtSignAccessToken(createUser, '1d')
-            const refreshToken = jwtSignRefreshToken(createUser, '1y')
+            // const accessToken = jwtSignAccessToken(createUser, '1d')
+            // const refreshToken = jwtSignRefreshToken(createUser, '1y')
+            const profileUpdateToken = jwtSignRefreshToken(createUser, '1d')
 
             // console.log('accessToken: ', accessToken)
             // console.log('refreshToken: ', refreshToken)
 
-            res.cookie('rft', refreshToken, {
-                domain: 'http://localhost:3000',
-                path: '/',
-                httpOnly: true, //accessible only by web server
-                secure: false, // should be true in production for https only
-                sameSite:false, // Cross-Site cookie
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-            })
+            // res.cookie('rft', refreshToken, {
+            //     domain: 'http://localhost:3000',
+            //     path: '/',
+            //     httpOnly: true, //accessible only by web server
+            //     secure: false, // should be true in production for https only
+            //     sameSite:false, // Cross-Site cookie
+            //     maxAge: 7 * 24 * 60 * 60 * 1000,
+            // })
 
-            return res.status(200).send({ ok: true, accessToken })
+            return res.status(200).send({ ok: true, profileUpdateToken })
 
         } catch (error) {
             console.log('TryCatch Error! ',  error.message)
