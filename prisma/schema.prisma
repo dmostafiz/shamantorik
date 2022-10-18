@@ -8,18 +8,19 @@ generator client {
 }
 
 model User {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  email    String    @unique
-  username String?
-  fullname String?
-  avatar   String?
-  bio      String?
-  quote    String?
-  phoneNo  String?
-  isNew    Boolean   @default(true)
-  role     String    @default("user")
-  posts    Post[]
-  Comment  Comment[]
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  email       String    @unique
+  userName    String?
+  fullName    String?
+  displayName String?
+  avatar      String?
+  bio         String?
+  quote       String?
+  phoneNo     String?
+  isNew       Boolean   @default(true)
+  role        String    @default("user")
+  posts       Post[]
+  comments    Comment[]
 
   followerIds String[] @db.ObjectId
   followers   User[]   @relation(name: "followers", fields: [followerIds], references: [id])
@@ -32,6 +33,10 @@ model User {
   postLikes Like[]
 
   password String?
+
+  gender String?
+
+  birthDate DateTime?
 
   // true, false
   isActive Boolean @default(false)

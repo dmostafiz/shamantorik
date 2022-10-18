@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const Cloudinary = require('../Helpers/Cloudinary');
 
 module.exports = {
 
@@ -28,7 +29,7 @@ module.exports = {
             res.cookie('rft', refreshToken, {
                 httpOnly: true, //accessible only by web server
                 secure: false, // should be true in production for https only
-                sameSite:false, // Cross-Site cookie
+                sameSite: false, // Cross-Site cookie
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
 
@@ -88,28 +89,17 @@ module.exports = {
                 }
             })
 
-            console.log('Created user: ', createUser)
-
-            // const accessToken = jwtSignAccessToken(createUser, '1d')
-            // const refreshToken = jwtSignRefreshToken(createUser, '1y')
-            const profileUpdateToken = jwtSignRefreshToken(createUser, '1d')
-
-            // console.log('accessToken: ', accessToken)
-            // console.log('refreshToken: ', refreshToken)
-
-            // res.cookie('rft', refreshToken, {
-            //     domain: 'http://localhost:3000',
-            //     path: '/',
-            //     httpOnly: true, //accessible only by web server
-            //     secure: false, // should be true in production for https only
-            //     sameSite:false, // Cross-Site cookie
-            //     maxAge: 7 * 24 * 60 * 60 * 1000,
-            // })
+            const profileUpdateToken = jwtSignUpdateToken(
+                {
+                    email: createUser.email,
+                    redirectUrl: '/acc/initial/update_profile_information'
+                }
+            )
 
             return res.status(200).send({ ok: true, profileUpdateToken })
 
         } catch (error) {
-            console.log('TryCatch Error! ',  error.message)
+            console.log('TryCatch Error! ', error.message)
             return res.status(500).send({ ok: false, msg: error.message })
         }
 
@@ -138,10 +128,14 @@ module.exports = {
                 }
             })
 
-            const accessToken = jwtSignAccessToken(user, '1d')
-            const refreshToken = jwtSignRefreshToken(user, '1y')
+            const profileUpdateToken = jwtSignUpdateToken(
+                {
+                    email: createUser.email,
+                    redirectUrl: '/acc/initial/update_profile_information'
+                }
+            )
 
-            return res.status(200).send({ ok: true, accessToken, refreshToken })
+            return res.status(200).send({ ok: true, profileUpdateToken })
 
         } catch (error) {
             return res.status(500).send({ ok: false, msg: error.message })
@@ -187,14 +181,106 @@ module.exports = {
         )
     },
 
+    updateInitialProfileInfo: async (req, res) => {
+
+        try {
+
+            
+            const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
+                folder: 'profile_images'
+            }) : null
+
+            console.log('imageUploadResult ', imageUploadResult)
+
+            const updateUser = await req.prisma.user.update({
+                where: {
+                    email: req.decoded.email
+                },
+
+                data: {
+                    avatar: imageUploadResult?.url,
+                    fullName: req.body.fullName,
+                    displayName: req.body.fullName,
+                    gender: req.body.gender,
+                    birthDate: new Date(req.body.birthDate).toISOString(),
+                    bio: req.body.bio,
+                }
+            })
+
+            console.log('updateUser ', updateUser)
+
+
+            const profileUpdateToken = jwtSignUpdateToken(
+                {
+                    image: updateUser.image,
+                    email: updateUser.email,
+                    fullname: updateUser.fullName,
+                    redirectUrl: '/acc/initial/update_username_password'
+                }
+            )
+
+            return res.status(200).send({ ok: true, profileUpdateToken })
+
+        } catch (error) {
+            console.log('Profile update error ', error.message)
+            return res.status(500).send({ ok: false, msg: error.message })
+
+        }
+
+
+    },
+
+    updateInitialUsernamePassword: async (req, res) => {
+
+        const password = bcrypt.hashSync(req.body.password, 12);
+
+        const updateUser = await req.prisma.user.update({
+           
+            where: {
+                email: req.decoded.email
+            },
+
+            data: {
+                userName: req.body.userName,
+                password: password,
+                isNew: false,
+                isActive: true,
+                verifiedAt: new Date()
+            }
+        })
+
+        console.log('Update User: ', updateUser)
+
+        const accesToken = jwtSignAccessToken(
+            {
+                fullname: updateUser.fullName,
+                userName: updateUser.userName,
+                email: updateUser.email,
+                avatar: updateUser.avatar
+            },
+            '1d'
+        )
+
+
+        return res.status(200).send({ ok: true, accesToken })
+
+    },
+
     logout: async (req, res) => {
         const cookies = req.cookies
         if (!cookies?.rft) return res.sendStatus(204) //No content
         res.clearCookie('rft', { httpOnly: true, sameSite: false, secure: false })
 
         res.json({ msg: 'Cookie cleared' })
-    }
+    },
 
+    authorizeUpdate_token: async (req, res) => {
+
+        const userEmail = req.decoded.email
+        const redirectUrl = req.decoded.redirectUrl
+
+        return res.json({ ok: true, redirectUrl: req.decoded.redirectUrl })
+    }
 }
 
 
@@ -210,11 +296,23 @@ const jwtSignAccessToken = (data, exp = '1d') => {
 
 
 
+
+
 const jwtSignRefreshToken = (data, exp = '1y') => {
     const token = jwt.sign(
         data,
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: exp }
+    );
+
+    return token
+}
+
+const jwtSignUpdateToken = (data) => {
+    const token = jwt.sign(
+        data,
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: '1w' }
     );
 
     return token

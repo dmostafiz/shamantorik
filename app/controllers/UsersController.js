@@ -39,7 +39,7 @@ module.exports = {
 
             } else if (by == 'username') {
                 searchQuery = {
-                    username: value
+                    userName: value
                 }
 
             } else if (by == 'id') {
@@ -51,7 +51,7 @@ module.exports = {
                 searchQuery = undefined
             }
 
-            const user = await req.prisma.user.findUnique({
+            const user = await req.prisma.user.findFirst({
                 where: searchQuery
             })
 
