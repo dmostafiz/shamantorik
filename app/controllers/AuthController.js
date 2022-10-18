@@ -79,7 +79,7 @@ module.exports = {
                 }
             })
 
-            if (user) return res.status(401).send({ ok: false, msg: 'দুঃখিত! ইমেইলটি অন্য একটি একাউন্ট এর সাথে সংযুক্ত আছে' })
+            if (user) return re.send({ ok: false, msg: 'দুঃখিত! ইমেইলটি অন্য একটি একাউন্ট এর সাথে সংযুক্ত আছে' })
 
 
             const createUser = await req.prisma.user.create({
@@ -99,6 +99,7 @@ module.exports = {
             return res.status(200).send({ ok: true, profileUpdateToken })
 
         } catch (error) {
+            
             console.log('TryCatch Error! ', error.message)
             return res.status(500).send({ ok: false, msg: error.message })
         }
