@@ -120,7 +120,7 @@ module.exports = {
             if (user) return res.status(401).send({ ok: false, msg: 'দুঃখিত! ইমেইলটি অন্য একটি একাউন্ট এর সাথে সংযুক্ত আছে' })
 
 
-            const createUser = req.prisma.user.create({
+            const createUser = await req.prisma.user.create({
                 data: {
                     email: email,
                     avatar: avatar,
@@ -131,6 +131,7 @@ module.exports = {
             const profileUpdateToken = jwtSignUpdateToken(
                 {
                     email: createUser.email,
+                    avatar: createUser.avatar,
                     redirectUrl: '/acc/initial/update_profile_information'
                 }
             )
@@ -138,6 +139,7 @@ module.exports = {
             return res.status(200).send({ ok: true, profileUpdateToken })
 
         } catch (error) {
+            console.log('Social Signup Error! ', error.message)
             return res.status(500).send({ ok: false, msg: error.message })
         }
 
