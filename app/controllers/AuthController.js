@@ -108,11 +108,11 @@ module.exports = {
 
     socialSignup: async (req, res) => {
 
-        const { email, avatar, host } = req.body
-
-        const hostName = host == 'google' ? 'গুগোল' : host == 'faceboot' ? 'ফেসবুক' : ''
-
         try {
+
+            const { email, avatar, host } = req.body
+    
+            const hostName = host == 'google' ? 'গুগোল' : host == 'faceboot' ? 'ফেসবুক' : ''
 
             const user = await req.prisma.user.findFirst({
                 where: {
@@ -142,7 +142,9 @@ module.exports = {
             return res.status(200).send({ ok: true, profileUpdateToken })
 
         } catch (error) {
+
             console.log('Social Signup Error! ', error.message)
+
             return res.status(500).send({ ok: false, msg: error.message })
         }
     },
