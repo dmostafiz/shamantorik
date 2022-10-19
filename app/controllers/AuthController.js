@@ -7,22 +7,28 @@ module.exports = {
 
     emailSignIn: async (req, res) => {
 
-        const { username, password } = req.body
+        const { email, password } = req.body
+
+        consoleLog('Login User ', email, password)
 
         try {
 
-            const user = await req.prisma.user.findOne({
+            const user = await req.prisma.user.findFirst({
                 where: {
-                    email: username
+                    OR: [
+                        {email: email},
+                        {userName: email}
+                    ]
                 }
             })
 
-            if (!user) return res.status(401).send({ ok: false, msg: 'একাঊন্ট খুজে পাওয়া যায়নি' })
+            consoleLog('Login User', user)
+
+            if (!user) return res.send({ ok: false, msg: 'একাঊন্ট খুজে পাওয়া যায়নি' })
 
             const compare = await bcrypt.compare(password, user.password)
 
-            if (!compare) return res.status(401).send({ ok: false, msg: 'পাসওয়ার্ড সঠিক নয়' })
-
+            if (!compare) return res.send({ ok: false, msg: 'পাসওয়ার্ড সঠিক নয়' })
 
             const accessToken = jwtSignAccessToken(user, '1d')
             const refreshToken = jwtSignRefreshToken(user, '1y')
@@ -34,10 +40,11 @@ module.exports = {
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
 
-            return res.status(200).send({ ok: true, accessToken, refreshToken })
+            return res.status(200).send({ ok: true, accessToken })
 
 
         } catch (error) {
+            consoleLog('Login Try Catch Error', error.message)
             return res.status(500).send({ ok: false, msg: error.message })
         }
 
@@ -100,7 +107,7 @@ module.exports = {
             return res.status(200).send({ ok: true, profileUpdateToken })
 
         } catch (error) {
-            
+
             consoleLog('TryCatch Error! ', error.message)
             return res.status(500).send({ ok: false, msg: error.message })
         }
@@ -112,7 +119,7 @@ module.exports = {
         try {
 
             const { email, avatar, host } = req.body
-    
+
             const hostName = host == 'google' ? 'গুগোল' : host == 'faceboot' ? 'ফেসবুক' : ''
 
             const user = await req.prisma.user.findFirst({
@@ -192,7 +199,7 @@ module.exports = {
 
         try {
 
-            
+
             const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
                 folder: 'profile_images'
             }) : null
@@ -244,7 +251,7 @@ module.exports = {
         const password = bcrypt.hashSync(req.body.password, 12);
 
         const updateUser = await req.prisma.user.update({
-           
+
             where: {
                 email: req.decoded.email
             },
@@ -260,27 +267,37 @@ module.exports = {
 
         consoleLog('Update User: ', updateUser)
 
-        const accesToken = jwtSignAccessToken(
+        const accessToken = jwtSignAccessToken(
             {
-                fullname: updateUser.fullName,
                 userName: updateUser.userName,
                 email: updateUser.email,
+                fullname: updateUser.fullName,
                 avatar: updateUser.avatar
             },
             '1d'
         )
 
 
-        return res.status(200).send({ ok: true, accesToken })
+        return res.status(200).send({ ok: true, accessToken })
 
     },
 
     logout: async (req, res) => {
-        const cookies = req.cookies
-        if (!cookies?.rft) return res.sendStatus(204) //No content
-        res.clearCookie('rft', { httpOnly: true, sameSite: false, secure: false })
 
-        res.json({ msg: 'Cookie cleared' })
+        try {
+            if (req.user) {
+                return res.json({ ok: true })
+            }
+
+        } catch (error) {
+            consoleLog('Logout User error', error.message)
+            res.json({ ok: false })
+        }
+        // const cookies = req.cookies
+        // if (!cookies?.rft) return res.sendStatus(204) //No content
+        // res.clearCookie('rft', { httpOnly: true, sameSite: false, secure: false })
+
+        // res.json({ msg: 'Cookie cleared' })
     },
 
     authorizeUpdate_token: async (req, res) => {
@@ -289,7 +306,57 @@ module.exports = {
         const redirectUrl = req.decoded.redirectUrl
 
         return res.json({ ok: true, redirectUrl: req.decoded.redirectUrl })
+    },
+
+    getAuthorisedUser: async (req, res) => {
+
+        try {
+            const authUser = req?.user
+
+            if (authUser) {
+
+                const userData = await req.prisma.user.findUnique({
+
+                    where: {
+                        email: authUser.email
+                    },
+
+                    select: {
+                        userName: true,
+                        fullName: true,
+                        displayName: true,
+                        email: true,
+                        avatar: true,
+                        bio: true,
+                        birthDate: true,
+                        gender: true,
+                        gender: true,
+                        createdAt: true,
+                        updatedAt: true
+                    }
+                })
+
+
+                consoleLog('get authorized user', userData)
+
+
+                return res.json({ ok: true, user: userData })
+            }
+
+            return res.json({ ok: false, msg: "আপনি অথরাইজড ব্লগার না।" })
+
+        } catch (error) {
+
+            consoleLog('get authorized user error', error.message)
+
+            return res.json({ ok: false, msg: "আপনি অথরাইজড ব্লগার না।" })
+
+        }
+
+
     }
+
+
 }
 
 
