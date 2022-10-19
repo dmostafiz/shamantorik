@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const Cloudinary = require('../Helpers/Cloudinary');
+const consoleLog = require('../Helpers/consoleLog');
 
 module.exports = {
 
@@ -100,7 +101,7 @@ module.exports = {
 
         } catch (error) {
             
-            console.log('TryCatch Error! ', error.message)
+            consoleLog('TryCatch Error! ', error.message)
             return res.status(500).send({ ok: false, msg: error.message })
         }
 
@@ -143,7 +144,7 @@ module.exports = {
 
         } catch (error) {
 
-            console.log('Social Signup Error! ', error.message)
+            consoleLog('Social Signup Error! ', error.message)
 
             return res.status(500).send({ ok: false, msg: error.message })
         }
@@ -196,7 +197,7 @@ module.exports = {
                 folder: 'profile_images'
             }) : null
 
-            console.log('imageUploadResult ', imageUploadResult)
+            consoleLog('imageUploadResult ', imageUploadResult)
 
             const updateUser = await req.prisma.user.update({
                 where: {
@@ -213,7 +214,7 @@ module.exports = {
                 }
             })
 
-            console.log('updateUser ', updateUser)
+            consoleLog('updateUser ', updateUser)
 
 
             const profileUpdateToken = jwtSignUpdateToken(
@@ -228,7 +229,9 @@ module.exports = {
             return res.status(200).send({ ok: true, profileUpdateToken })
 
         } catch (error) {
-            console.log('Profile update error ', error.message)
+
+            consoleLog('Profile update error', error.message)
+
             return res.status(500).send({ ok: false, msg: error.message })
 
         }
@@ -255,7 +258,7 @@ module.exports = {
             }
         })
 
-        console.log('Update User: ', updateUser)
+        consoleLog('Update User: ', updateUser)
 
         const accesToken = jwtSignAccessToken(
             {
