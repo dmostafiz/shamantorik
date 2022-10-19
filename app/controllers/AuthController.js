@@ -108,7 +108,9 @@ module.exports = {
 
     socialSignup: async (req, res) => {
 
-        const { email, avatar } = req.body
+        const { email, avatar, host } = req.body
+
+        const hostName = host == 'google' ? 'গুগোল' : host == 'faceboot' ? 'ফেসবুক' : ''
 
         try {
 
@@ -118,7 +120,7 @@ module.exports = {
                 }
             })
 
-            if (user) return res.send({ ok: false, msg: 'দুঃখিত! ইমেইলটি অন্য একটি একাউন্ট এর সাথে সংযুক্ত আছে' })
+            if (user) return res.send({ ok: false, msg: `দুঃখিত! ${hostName} একাউন্টটি আগে থেকে সংযুক্ত আছে।` })
 
 
             const createUser = await req.prisma.user.create({
