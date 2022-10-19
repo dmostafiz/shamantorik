@@ -121,7 +121,7 @@ module.exports = {
                 }
             })
 
-            if (user) return res.send({ ok: false, msg: `দুঃখিত! ${hostName} একাউন্টটি আগে থেকে সংযুক্ত আছে।` })
+            if (user) return res.send({ ok: false, msg: `${hostName} একাউন্টটি আগে থেকে সংযুক্ত আছে।` })
 
 
             const createUser = await req.prisma.user.create({
