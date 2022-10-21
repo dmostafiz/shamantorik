@@ -56,7 +56,7 @@ module.exports = {
 
         try {
 
-            const user = await req.prisma.user.findOne({
+            const user = await req.prisma.user.findFirst({
                 where: {
                     email: email
                 }

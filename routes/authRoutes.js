@@ -17,9 +17,6 @@ router.post('/logout', authMiddleware, logout)
 router.post('/authorize_initial_acc_update_token',authorizeProfileUpdate, authorizeUpdate_token)
 router.get('/get_authorised_user',authMiddleware, getAuthorisedUser)
 
-
-
-
 router.post('/update_initial_profile_info',authorizeProfileUpdate, updateInitialProfileInfo)
 router.post('/update_initial_usernamePassword',authorizeProfileUpdate, updateInitialUsernamePassword)
 module.exports = router
