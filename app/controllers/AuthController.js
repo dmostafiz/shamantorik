@@ -96,6 +96,7 @@ module.exports = {
             return res.send({ ok: true, type: 'login', accessToken, refreshToken })
 
         } catch (error) {
+            consoleLog('Social login error', error.message)
             return res.status(500).send({ ok: false, msg: error.message })
         }
 
