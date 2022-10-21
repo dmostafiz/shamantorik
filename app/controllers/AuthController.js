@@ -30,6 +30,19 @@ module.exports = {
 
             if (!compare) return res.send({ ok: false, msg: 'পাসওয়ার্ড সঠিক নয়' })
 
+            if(user.isNew == true){
+
+                const profileUpdateToken = jwtSignUpdateToken(
+                    {
+                        email: createUser.email,
+                        redirectUrl: '/acc/initial/update_profile_information'
+                    }
+                )
+    
+                return res.send({ ok: true, type: 'update', profileUpdateToken })
+
+            }
+
             const accessToken = jwtSignAccessToken(user, '1d')
             const refreshToken = jwtSignRefreshToken(user, '1y')
 
@@ -40,7 +53,7 @@ module.exports = {
                 maxAge: 7 * 24 * 60 * 60 * 1000
             })
 
-            return res.status(200).send({ ok: true, accessToken })
+            return res.send({ ok: true, type: 'login', accessToken })
 
 
         } catch (error) {
@@ -64,10 +77,23 @@ module.exports = {
 
             if (!user) return res.status(401).send({ ok: false, msg: 'একাঊন্ট খুজে পাওয়া যায়নি' })
 
+            if(user.isNew == true){
+
+                const profileUpdateToken = jwtSignUpdateToken(
+                    {
+                        email: createUser.email,
+                        redirectUrl: '/acc/initial/update_profile_information'
+                    }
+                )
+    
+                return res.send({ ok: true, type: 'update', profileUpdateToken })
+
+            }
+
             const accessToken = jwtSignAccessToken(user, '1d')
             const refreshToken = jwtSignRefreshToken(user, '1y')
 
-            return res.status(200).send({ ok: true, accessToken, refreshToken })
+            return res.send({ ok: true, type: 'login', accessToken, refreshToken })
 
         } catch (error) {
             return res.status(500).send({ ok: false, msg: error.message })
