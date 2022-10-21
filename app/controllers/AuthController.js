@@ -75,7 +75,7 @@ module.exports = {
                 }
             })
 
-            if (!user) return res.status(401).send({ ok: false, msg: 'একাঊন্ট খুজে পাওয়া যায়নি' })
+            if (!user) return res.send({ ok: false, msg: 'একাঊন্ট খুজে পাওয়া যায়নি' })
 
             if(user.isNew == true){
 
