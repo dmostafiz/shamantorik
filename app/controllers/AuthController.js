@@ -34,7 +34,7 @@ module.exports = {
 
                 const profileUpdateToken = jwtSignUpdateToken(
                     {
-                        email: createUser.email,
+                        email: user.email,
                         redirectUrl: '/acc/initial/update_profile_information'
                     }
                 )
@@ -81,7 +81,7 @@ module.exports = {
 
                 const profileUpdateToken = jwtSignUpdateToken(
                     {
-                        email: createUser.email,
+                        email: user.email,
                         redirectUrl: '/acc/initial/update_profile_information'
                     }
                 )
