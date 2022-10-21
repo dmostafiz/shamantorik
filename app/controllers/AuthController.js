@@ -356,6 +356,7 @@ module.exports = {
                         avatar: true,
                         bio: true,
                         birthDate: true,
+                        followers: true,
                         gender: true,
                         gender: true,
                         createdAt: true,
