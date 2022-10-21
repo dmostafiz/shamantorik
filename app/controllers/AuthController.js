@@ -35,6 +35,7 @@ module.exports = {
                 const profileUpdateToken = jwtSignUpdateToken(
                     {
                         email: user.email,
+                        avatar: user.avatar,
                         redirectUrl: '/acc/initial/update_profile_information'
                     }
                 )
@@ -82,6 +83,7 @@ module.exports = {
                 const profileUpdateToken = jwtSignUpdateToken(
                     {
                         email: user.email,
+                        avatar: user.avatar,
                         redirectUrl: '/acc/initial/update_profile_information'
                     }
                 )
@@ -127,6 +129,7 @@ module.exports = {
             const profileUpdateToken = jwtSignUpdateToken(
                 {
                     email: createUser.email,
+                    avatar: '',
                     redirectUrl: '/acc/initial/update_profile_information'
                 }
             )
@@ -330,10 +333,11 @@ module.exports = {
 
     authorizeUpdate_token: async (req, res) => {
 
-        const userEmail = req.decoded.email
+        const email = req.decoded.email
         const redirectUrl = req.decoded.redirectUrl
+        const avatar = req.decoded.avatar
 
-        return res.json({ ok: true, redirectUrl: req.decoded.redirectUrl })
+        return res.json({ ok: true, email, avatar, redirectUrl })
     },
 
     getAuthorisedUser: async (req, res) => {
@@ -384,10 +388,7 @@ module.exports = {
 
 
     }
-
-
 }
-
 
 const jwtSignAccessToken = (data, exp = '1d') => {
     const token = jwt.sign(
