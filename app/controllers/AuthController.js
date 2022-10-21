@@ -136,6 +136,7 @@ module.exports = {
         } catch (error) {
 
             consoleLog('TryCatch Error! ', error.message)
+
             return res.status(500).send({ ok: false, msg: error.message })
         }
 
@@ -147,7 +148,7 @@ module.exports = {
 
             const { email, avatar, host } = req.body
 
-            const hostName = host == 'google' ? 'গুগোল' : host == 'faceboot' ? 'ফেসবুক' : ''
+            const hostName = host == 'google' ? 'গুগোল' : host == 'facebook' ? 'ফেসবুক' : ''
 
             const user = await req.prisma.user.findFirst({
                 where: {
