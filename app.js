@@ -15,8 +15,9 @@ var app = express();
 app.use(cors({
   origin: [
     'http://localhost:3000', 
-    'https://nogorshoily.vercel.app',
-    'https://rongon.netlify.app'
+    'https://bengalread.vercel.app',
+    'https://bengalread.netlify.app',
+    'https://bengalread.com',
   ],
   credentials: true,
 }))
