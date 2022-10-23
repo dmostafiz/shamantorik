@@ -47,12 +47,7 @@ module.exports = {
             const accessToken = jwtSignAccessToken(user, '1d')
             const refreshToken = jwtSignRefreshToken(user, '1y')
 
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true, //accessible only by web server
-                maxAge: 365 * 24 * 60 * 60 * 1000,
-                SameSite: 'None',
-                secure: true
-            })
+            setRefreshTokenCookie(res, refreshToken)
 
             return res.send({ ok: true, type: 'login', accessToken })
 
@@ -95,16 +90,12 @@ module.exports = {
             const accessToken = jwtSignAccessToken(user, '1d')
             const refreshToken = jwtSignRefreshToken(user, '1y')
 
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true, //accessible only by web server
-                maxAge: 365 * 24 * 60 * 60 * 1000,
-                SameSite: 'None',
-                secure: true
-            })
+            setRefreshTokenCookie(res, refreshToken)
+
 
             // ('Response: cookie', res)
 
-            return res.send({ ok: true, type: 'login', accessToken, refreshToken })
+            return res.send({ ok: true, type: 'login', accessToken })
 
         } catch (error) {
             consoleLog('Social login error', error.message)
@@ -328,12 +319,7 @@ module.exports = {
             }
         )
 
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true, //accessible only by web server
-            maxAge: 365 * 24 * 60 * 60 * 1000,
-            SameSite: 'None',
-            secure: true
-        })
+        setRefreshTokenCookie(res, refreshToken)
 
         return res.status(200).send({ ok: true, accessToken })
 
@@ -345,10 +331,11 @@ module.exports = {
             if (req.user) {
 
                 const cookies = req.cookies
-                if (!cookies?.refreshToken) return res.sendStatus(204) //No content
-                res.clearCookie('refreshToken', { httpOnly: true, SameSite: 'None', secure: true })
+                // if (!cookies?.refreshToken) return res.sendStatus(204) //No content
+                res.clearCookie('refreshToken', { httpOnly: true, SameSite: 'none', secure: true })
+
                 return res.json({ ok: true, msg: 'Cookie cleared' })
-                
+
             }
 
         } catch (error) {
@@ -428,6 +415,15 @@ const jwtSignAccessToken = (data, exp = '1d') => {
 
 
 
+const setRefreshTokenCookie = (res, refreshToken) => {
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true, //accessible only by web server
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+        SameSite: 'None',
+        secure: true
+    })
+}
+ 
 
 
 const jwtSignRefreshToken = (data, exp = '1y') => {
