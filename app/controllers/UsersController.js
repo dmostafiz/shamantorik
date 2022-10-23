@@ -76,4 +76,23 @@ module.exports = {
 
     },
 
+    getAuthDraftedPosts: async (req, res) => {
+        try {
+
+            const posts = await req.prisma.post.findMany({
+                where: {
+                    authorId: req.user.id,
+                    status: 'drafted'
+                }
+            })
+
+            consoleLog('find author drafted posts', posts)
+
+            return res.json({ok: true, posts})
+            
+        } catch (error) {
+            consoleLog('author drafted posts error', error.message)
+        }
+    }
+
 }
