@@ -97,18 +97,12 @@ module.exports = {
 
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true, //accessible only by web server
-                // secure: false, // should be true in production for https only
-                // Cross-Site cookie
-                // domain: 'http://localhost:3000',
-                // pqth: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000,
                 SameSite: 'None',
                 secure: true
             })
 
             console.log('Response: cookie', res)
-
-
 
             return res.send({ ok: true, type: 'login', accessToken, refreshToken })
 
