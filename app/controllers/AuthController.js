@@ -419,8 +419,8 @@ const setRefreshTokenCookie = (res, refreshToken) => {
     res.cookie('refreshToken', refreshToken, {
         httpOnly: true, //accessible only by web server
         maxAge: 365 * 24 * 60 * 60 * 1000,
-        SameSite: 'None',
-        secure: true
+        secure: true,
+        SameSite: 'none'
     })
 }
  
