@@ -47,11 +47,11 @@ module.exports = {
             const accessToken = jwtSignAccessToken(user, '1d')
             const refreshToken = jwtSignRefreshToken(user, '1y')
 
-            res.cookie('rft', refreshToken, {
+            res.cookie('refreshToken', refreshToken, {
                 httpOnly: true, //accessible only by web server
-                secure: false, // should be true in production for https only
-                sameSite: false, // Cross-Site cookie
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 365 * 24 * 60 * 60 * 1000,
+                SameSite: 'None',
+                secure: true
             })
 
             return res.send({ ok: true, type: 'login', accessToken })
@@ -102,7 +102,7 @@ module.exports = {
                 secure: true
             })
 
-            console.log('Response: cookie', res)
+            // ('Response: cookie', res)
 
             return res.send({ ok: true, type: 'login', accessToken, refreshToken })
 
@@ -319,6 +319,21 @@ module.exports = {
             '1d'
         )
 
+        const refreshToken = jwtSignRefreshToken(
+            {
+                userName: updateUser.userName,
+                email: updateUser.email,
+                fullname: updateUser.fullName,
+                avatar: updateUser.avatar
+            }
+        )
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true, //accessible only by web server
+            maxAge: 365 * 24 * 60 * 60 * 1000,
+            SameSite: 'None',
+            secure: true
+        })
 
         return res.status(200).send({ ok: true, accessToken })
 
