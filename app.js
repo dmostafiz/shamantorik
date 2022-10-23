@@ -4,7 +4,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
-
+const session = require('cookie-session')
+const helmet = require('helmet')
 // var indexRouter = require('./routes/index');
 require("dotenv").config()
 
@@ -12,6 +13,12 @@ const { PrismaClient } = require('@prisma/client');
 const consoleLog = require('./app/Helpers/consoleLog');
 
 var app = express();
+
+app.set('trust proxy', 1)
+
+app.use(helmet())
+
+app.disable('x-powered-by')
 
 app.use(cors({
   origin: [
@@ -22,6 +29,22 @@ app.use(cors({
   ],
   credentials: true,
 }))
+
+const expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+
+app.use(session({
+  name: 'sessionId',
+  secret: process.env.REFRESH_TOKEN_SECRET,
+  // keys: ['key1', 'key2'],
+  cookie: {
+    secure: true,
+    httpOnly: true,
+    // domain: 'example.com',
+    // path: 'foo/bar',
+    expires: expiryDate
+  }
+}))
+
 
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
