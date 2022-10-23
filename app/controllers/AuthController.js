@@ -200,9 +200,11 @@ module.exports = {
     refereshToken: async (req, res) => {
         const cookies = req.cookies
 
-        if (!cookies?.rft) return res.status(401).json({ msg: 'Unauthorized!' })
+        if (!cookies?.refreshToken) return res.status(401).json({ msg: 'Unauthorized!' })
 
-        const refreshToken = cookies.rft
+        const refreshToken = cookies.refreshToken
+
+        consoleLog('refreshToken', refreshToken)
 
         jwt.verify(
             refreshToken,
