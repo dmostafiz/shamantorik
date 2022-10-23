@@ -97,7 +97,7 @@ module.exports = {
 
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true, //accessible only by web server
-                maxAge: 7 * 24 * 60 * 60 * 1000,
+                maxAge: 365 * 24 * 60 * 60 * 1000,
                 SameSite: 'None',
                 secure: true
             })
