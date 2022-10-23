@@ -16,8 +16,8 @@ module.exports = {
             const user = await req.prisma.user.findFirst({
                 where: {
                     OR: [
-                        {email: email},
-                        {userName: email}
+                        { email: email },
+                        { userName: email }
                     ]
                 }
             })
@@ -30,7 +30,7 @@ module.exports = {
 
             if (!compare) return res.send({ ok: false, msg: 'পাসওয়ার্ড সঠিক নয়' })
 
-            if(user.isNew == true){
+            if (user.isNew == true) {
 
                 const profileUpdateToken = jwtSignUpdateToken(
                     {
@@ -39,7 +39,7 @@ module.exports = {
                         redirectUrl: '/acc/initial/update_profile_information'
                     }
                 )
-    
+
                 return res.send({ ok: true, type: 'update', profileUpdateToken })
 
             }
@@ -78,7 +78,7 @@ module.exports = {
 
             if (!user) return res.send({ ok: false, msg: 'একাঊন্ট খুজে পাওয়া যায়নি' })
 
-            if(user.isNew == true){
+            if (user.isNew == true) {
 
                 const profileUpdateToken = jwtSignUpdateToken(
                     {
@@ -87,13 +87,26 @@ module.exports = {
                         redirectUrl: '/acc/initial/update_profile_information'
                     }
                 )
-    
+
                 return res.send({ ok: true, type: 'update', profileUpdateToken })
 
             }
 
             const accessToken = jwtSignAccessToken(user, '1d')
             const refreshToken = jwtSignRefreshToken(user, '1y')
+
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: false, //accessible only by web server
+                // secure: false, // should be true in production for https only
+                // Cross-Site cookie
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                SameSite: 'none',
+                secure: true
+            })
+
+            console.log('Response: cookie', res)
+
+
 
             return res.send({ ok: true, type: 'login', accessToken, refreshToken })
 

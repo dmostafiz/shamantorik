@@ -6,15 +6,16 @@ var logger = require('morgan');
 const cors = require('cors');
 
 // var indexRouter = require('./routes/index');
-require('dotenv')
+require("dotenv").config()
 
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client');
+const consoleLog = require('./app/Helpers/consoleLog');
 
 var app = express();
 
 app.use(cors({
   origin: [
-    'http://localhost:3000', 
+    'http://localhost:3000',
     'https://bengalread.vercel.app',
     'https://bengalread.netlify.app',
     'https://bengalread.com',
@@ -28,19 +29,28 @@ app.use(cors({
 
 app.use(logger('dev'));
 app.use(cookieParser());
-app.use(express.json({limit: '2mb'}));
+app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({
   extended: true,
   // limit: '5mb'
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const prismaClient = async function (req, res, next) {
-  req.prisma = new PrismaClient()
-  next()
-}
+const prisma = new PrismaClient()
 
-app.use(prismaClient)
+app.use(function (req, res, next) {
+
+  req.prisma = prisma
+
+  req.on('finish', async () => {
+
+    await prisma.$disconnect()
+
+  })
+
+  next()
+})
+
 
 require('./routes')(app)
 
