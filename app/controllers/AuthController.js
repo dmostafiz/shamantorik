@@ -343,18 +343,18 @@ module.exports = {
 
         try {
             if (req.user) {
-                return res.json({ ok: true })
+
+                const cookies = req.cookies
+                if (!cookies?.refreshToken) return res.sendStatus(204) //No content
+                res.clearCookie('refreshToken', { httpOnly: true, SameSite: 'None', secure: true })
+                return res.json({ ok: true, msg: 'Cookie cleared' })
+                
             }
 
         } catch (error) {
             consoleLog('Logout User error', error.message)
             res.json({ ok: false })
         }
-        // const cookies = req.cookies
-        // if (!cookies?.rft) return res.sendStatus(204) //No content
-        // res.clearCookie('rft', { httpOnly: true, sameSite: false, secure: false })
-
-        // res.json({ msg: 'Cookie cleared' })
     },
 
     authorizeUpdate_token: async (req, res) => {
