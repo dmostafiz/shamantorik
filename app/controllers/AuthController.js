@@ -96,11 +96,13 @@ module.exports = {
             const refreshToken = jwtSignRefreshToken(user, '1y')
 
             res.cookie('refreshToken', refreshToken, {
-                httpOnly: false, //accessible only by web server
+                httpOnly: true, //accessible only by web server
                 // secure: false, // should be true in production for https only
                 // Cross-Site cookie
+                // domain: 'http://localhost:3000',
+                // pqth: '/',
                 maxAge: 7 * 24 * 60 * 60 * 1000,
-                SameSite: 'none',
+                SameSite: 'None',
                 secure: true
             })
 
