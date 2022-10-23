@@ -1,4 +1,5 @@
 const cookie = require('cookie');
+const consoleLog = require('../Helpers/consoleLog');
 
 module.exports = {
 
@@ -62,7 +63,7 @@ module.exports = {
             res.json({ok: false, msg: 'কোন সদস্য পাওয়া যায়নি'})
 
         } catch (error) {
-            console.log('TryCatch Error: ', error.message)
+            consoleLog('TryCatch Error: ', error.message)
             return res.status(500).json({ ok: false, msg: error.message })
         }
     },

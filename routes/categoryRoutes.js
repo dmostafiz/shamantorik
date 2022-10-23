@@ -1,11 +1,9 @@
 const { Router } = require("express")
-const { createAllCategory } = require("../app/controllers/CategoryController")
+const { createAllCategory, getAllCategory } = require("../app/controllers/CategoryController")
 const router = Router()
 
-router.get('/create', (req, res) => {
-
-    res.json('Create All Category')
-})
+router.get('/', getAllCategory)
+router.get('/create', createAllCategory)
 
 // router.post('/check_user_exists', checkUserExist)
 

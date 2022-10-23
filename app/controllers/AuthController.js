@@ -400,7 +400,38 @@ module.exports = {
         }
 
 
+    },
+
+    check_post_author: async (req, res) => {
+
+        const { postId } = req.body
+
+        consoleLog(' req.body',  req.body)
+        consoleLog('post id & author id', `${postId} & ${req?.user?.id}`)
+
+        try {
+
+            const post = await req.prisma.post.findFirst({
+                where: {
+                    id: postId,
+                    authorId: req?.user?.id
+                }
+            })
+
+            consoleLog('check post author', post)
+
+
+            if (!post) return res.json({ok: false})
+
+            return res.json({ ok: true, post})
+
+        } catch (error) {
+            consoleLog('check post author error', error.message)
+            return res.json({ ok: false })
+        }
     }
+
+
 }
 
 const jwtSignAccessToken = (data, exp = '1d') => {
@@ -423,7 +454,7 @@ const setRefreshTokenCookie = (res, refreshToken) => {
         SameSite: 'none'
     })
 }
- 
+
 
 
 const jwtSignRefreshToken = (data, exp = '1y') => {

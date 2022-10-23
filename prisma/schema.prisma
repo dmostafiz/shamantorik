@@ -51,8 +51,8 @@ model User {
 model Post {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  author   User?   @relation(fields: [authorId], references: [id])
   authorId String? @db.ObjectId
+  author   User?   @relation(fields: [authorId], references: [id])
 
   // normal, multiStep
   postType String @default("normal")
@@ -67,8 +67,8 @@ model Post {
 
   childs Post[] @relation("post")
 
-  title   String
-  content String
+  title   String?
+  content String?
   image   String?
 
   images String[]
@@ -79,7 +79,7 @@ model Post {
   // drafted, published
   status String @default("drafted")
 
-  commentIds String    @db.ObjectId
+  commentIds String[]  @db.ObjectId
   comments   Comment[]
 
   views PostView[]

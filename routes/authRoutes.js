@@ -3,7 +3,7 @@ const router = Router()
 const { getUsers } = require('../app/controllers/UsersController');
 const adminAuthMiddleware = require('../app/middlewares/adminAuthMiddleware');
 const authMiddleware = require('../app/middlewares/authMiddleware');
-const { emailSignIn, emailSignup, socialSignIn, socialSignup, refereshToken, logout, authorizeUpdate_token, updateInitialProfileInfo, updateInitialUsernamePassword, getAuthorisedUser } = require('../app/controllers/AuthController');
+const { emailSignIn, emailSignup, socialSignIn, socialSignup, refereshToken, logout, authorizeUpdate_token, updateInitialProfileInfo, updateInitialUsernamePassword, getAuthorisedUser, check_post_author } = require('../app/controllers/AuthController');
 const authorizeProfileUpdate = require("../app/middlewares/authorizeProfileUpdate");
 
 
@@ -19,5 +19,6 @@ router.get('/get_authorised_user',authMiddleware, getAuthorisedUser)
 router.post('/update_initial_profile_info',authorizeProfileUpdate, updateInitialProfileInfo)
 router.post('/update_initial_usernamePassword',authorizeProfileUpdate, updateInitialUsernamePassword)
 router.post('/authorize_initial_acc_update_token',authorizeProfileUpdate, authorizeUpdate_token)
+router.post('/check_post_author',authMiddleware, check_post_author)
 
 module.exports = router
