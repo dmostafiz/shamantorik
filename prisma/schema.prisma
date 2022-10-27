@@ -58,7 +58,7 @@ model Post {
   postType String @default("normal")
 
   // new, old
-  postStatus String @default("new")
+  // postStatus String @default("new")
 
   part Int?
 
@@ -68,6 +68,7 @@ model Post {
   childs Post[] @relation("post")
 
   title   String?
+  slug    String?
   content String?
   image   String?
 

@@ -7,13 +7,14 @@ module.exports = {
 
         const categories = await req.prisma.category.findMany({
             select: {
+                id: true,
                 name: true,
                 slug: true,
                 posts: true
             }
         })
 
-        consoleLog('categories', categories)
+        // consoleLog('categories', categories)
 
         return res.json({ok: true, categories})
     },
