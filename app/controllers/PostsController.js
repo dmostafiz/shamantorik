@@ -45,7 +45,7 @@ module.exports = {
                 where: {
                     id: postId
                 },
-                
+
                 include: {
                     author: true
                 }
@@ -53,10 +53,13 @@ module.exports = {
 
             consoleLog('editing post', post)
 
-            return res.json({ ok: true, post })
+            if(post) return res.json({ ok: true, post })
+
+            return res.json({ ok: false })
 
         } catch (error) {
             consoleLog('get editing post error', error.message)
+            return res.json({ ok: false })
         }
     },
 
