@@ -18,6 +18,57 @@ module.exports = {
         return res.json({ users, securedUser: req.user, isAdmin: req.isAdmin })
     },
 
+    
+    getBlogger: async (req, res) => {
+
+        const userId = req.params.userId
+
+        try {
+            const user = await req.prisma.user.findFirst({
+                where: {
+                    id: userId,
+                    isActive: true,
+                    isNew: false
+                },
+                select: {
+                    id: true,
+                    // userName: true,
+                    // email: true,
+                    fullName: true,
+                    displayName: true,
+                    bio: true,
+                    avatar: true,
+                    followers: true,
+                    followings: true,
+                    comments: true,
+                    views: true,
+                    postLikes: true,
+                    birthDate: true,
+                    createdAt: true,
+                    gender: true,
+                    posts: {
+                        where: {
+                            status: 'published'
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    }
+                }
+            })
+
+            if(!user) return res.json({ok: false})
+    
+            return res.json({ok: true, user })
+            
+        } catch (error) {
+
+            consoleLog('get blogger error', error.message)
+            res.json({ok: false})
+            
+        }
+
+    },
 
     checkUserExist: async (req, res) => {
         const { by, value } = req.body
