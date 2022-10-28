@@ -39,6 +39,7 @@ module.exports = {
                     },
 
                     select: {
+                        id: true,
                         fullName: true,
                         displayName: true,
                         bio: true,
