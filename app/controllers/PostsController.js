@@ -1,6 +1,5 @@
 const Cloudinary = require("../Helpers/Cloudinary")
 const consoleLog = require("../Helpers/consoleLog")
-// const slugify = require('slugify')
 
 module.exports = {
 
@@ -19,11 +18,14 @@ module.exports = {
                 },
 
                 include: {
-                    author: true
+                    author: true,
+                    views: true,
+                    comments: true,
+                    likes: true
                 }
             })
 
-            consoleLog('latest posts', posts)
+            // consoleLog('latest posts', posts)
 
             return res.json({ ok: true, posts })
 
@@ -37,8 +39,11 @@ module.exports = {
     },
 
     getPostById: async (req, res) => {
-        const postId = req.params.postId
 
+        const postId = req.params.postId
+        const userId = req?.user?.id
+
+        // consoleLog('auth userId', userId)
         try {
 
             const post = await req.prisma.post.findFirst({
@@ -47,13 +52,16 @@ module.exports = {
                 },
 
                 include: {
-                    author: true
+                    author: true,
+                    comments: true,
+                    views: true,
+                    likes: true
                 }
             })
 
-            consoleLog('editing post', post)
+            // consoleLog('single post', post.views.length)
 
-            if(post) return res.json({ ok: true, post })
+            if (post) return res.json({ ok: true, post })
 
             return res.json({ ok: false })
 
@@ -149,6 +157,68 @@ module.exports = {
         } catch (error) {
             consoleLog('post update error', error.message)
         }
+
+    },
+
+    storePostTraffic: async (req, res) => {
+
+        try {
+
+            const ip = req.ip
+            const postId = req.params.postId
+            const authUserId = req?.user?.id
+
+            // console.log('User Agent extracted', req.ua)
+
+
+            const whereObj = authUserId ?
+                {
+                    userId: authUserId,
+                }
+
+                : {
+                    ip: ip,
+                    browser: req.ua.browser,
+                    platform: req.ua.platform,
+                    device: req.ua.device,
+                    os: req.ua.os,
+                }
+
+            const existTraffic = await req.prisma.postView.findFirst({
+                where: { postId: postId, ...whereObj }
+            })
+
+            if (existTraffic) {
+
+                consoleLog('Created Post Trafic', 'Already exists')
+                return res.json({ ok: false, msg: 'Already have same traffic' })
+            }
+
+
+            const createTraffic = await req.prisma.postView.create({
+                data: {
+                    postId: postId,
+                    userId: authUserId,
+                    ip: ip,
+                    device: req.ua.device,
+                    os: req.ua.os,
+                    platform: req.ua.platform,
+                    browser: req.ua.browser,
+                }
+            })
+
+            consoleLog('Created Post Trafic', 'ok??')
+
+            return res.json({ ok: true, traffic: createTraffic })
+
+        } catch (error) {
+
+            consoleLog('post traffic error', error.message)
+
+        }
+
+
+
 
     },
 

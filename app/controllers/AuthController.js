@@ -19,6 +19,17 @@ module.exports = {
                         { email: email },
                         { userName: email }
                     ]
+                },
+                select: {
+                    id: true,
+                    userName: true,
+                    fullName: true,
+                    displayName: true,
+                    email:true,
+                    avatar: true,
+                    // isNew: true,
+                    // isActive: true,
+                    // role: true
                 }
             })
 
@@ -68,6 +79,17 @@ module.exports = {
             const user = await req.prisma.user.findFirst({
                 where: {
                     email: email
+                }, 
+                select: {
+                    id: true,
+                    userName: true,
+                    fullName: true,
+                    displayName: true,
+                    email:true,
+                    avatar: true,
+                    // isNew: true,
+                    // isActive: true,
+                    // role: true
                 }
             })
 
@@ -302,6 +324,7 @@ module.exports = {
 
         const accessToken = jwtSignAccessToken(
             {
+                id: updateUser.id,
                 userName: updateUser.userName,
                 email: updateUser.email,
                 fullname: updateUser.fullName,
@@ -312,6 +335,7 @@ module.exports = {
 
         const refreshToken = jwtSignRefreshToken(
             {
+                id: updateUser.id,
                 userName: updateUser.userName,
                 email: updateUser.email,
                 fullname: updateUser.fullName,
@@ -383,7 +407,7 @@ module.exports = {
                 })
 
 
-                consoleLog('get authorized user', userData)
+                // consoleLog('get authorized user', userData)
 
 
                 return res.json({ ok: true, user: userData })
@@ -406,8 +430,8 @@ module.exports = {
 
         const { postId } = req.body
 
-        consoleLog(' req.body',  req.body)
-        consoleLog('post id & author id', `${postId} & ${req?.user?.id}`)
+        // consoleLog(' req.body',  req.body)
+        // consoleLog('post id & author id', `${postId} & ${req?.user?.id}`)
 
         try {
 
@@ -418,7 +442,7 @@ module.exports = {
                 }
             })
 
-            consoleLog('check post author', post)
+            // consoleLog('check post author', post)
 
 
             if (!post) return res.json({ok: false})

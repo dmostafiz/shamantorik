@@ -11,6 +11,7 @@ require("dotenv").config()
 
 const { PrismaClient } = require('@prisma/client');
 const consoleLog = require('./app/Helpers/consoleLog');
+const useragent = require('express-useragent')
 
 var app = express();
 
@@ -70,6 +71,38 @@ app.use(function (req, res, next) {
     await prisma.$disconnect()
 
   })
+
+  next()
+})
+
+
+app.use(function (req, res, next) {
+  
+  const ua = useragent.parse(req.headers['user-agent'])
+
+  const device = ua.isAndroid ? 'phone'
+    : ua.isWindows ? 'desktop'
+      : ua.isWindowsPhone ? 'phone'
+        : ua.isTablet ? 'tab'
+          : ua.isAndroidTablet ? 'tab'
+            : ua.isLinux ? 'desktop'
+              : ua.isLinux64 ? 'desktop'
+                : ua.isMac ? 'desktop'
+                  : ua.isMobile ? 'phone'
+                    : ua.isiPhone ? 'phone'
+                      : ua.isiPod ? 'tab'
+                        : ua.isiPad ? 'tab'
+                          : 'unknown'
+
+  const os = ua.os
+  const platform = ua.platform
+  const browser = ua.browser
+
+  const userAgent = { device, os, platform, browser }
+
+  req.ua = userAgent
+
+  // console.log('User Agent from middleware', userAgent)
 
   next()
 })

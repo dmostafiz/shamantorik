@@ -8,8 +8,8 @@ generator client {
 }
 
 model User {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  email       String    @unique
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  email       String  @unique
   userName    String?
   fullName    String?
   displayName String?
@@ -17,10 +17,12 @@ model User {
   bio         String?
   quote       String?
   phoneNo     String?
-  isNew       Boolean   @default(true)
-  role        String    @default("user")
+  isNew       Boolean @default(true)
+  role        String  @default("user")
   posts       Post[]
-  comments    Comment[]
+
+  postComments Comment[] @relation(name: "comentingUser")
+  getComments  Comment[] @relation(name: "postAuthor")
 
   followerIds String[] @db.ObjectId
   followers   User[]   @relation(name: "followers", fields: [followerIds], references: [id])
@@ -46,6 +48,8 @@ model User {
   verifiedAt DateTime?
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
+
+  PostViews PostView[]
 }
 
 model Post {
@@ -117,8 +121,11 @@ model Like {
 model Comment {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  author   User?   @relation(fields: [authorId], references: [id])
   authorId String? @db.ObjectId
+  author   User?   @relation(name: "comentingUser", fields: [authorId], references: [id])
+
+  userId String? @db.ObjectId
+  user   User?   @relation(name: "postAuthor", fields: [userId], references: [id])
 
   postId String @db.ObjectId
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -140,16 +147,26 @@ model PostView {
   postId String @db.ObjectId
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  ip    String
-  agent String
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  ip    String?
+  device   String?
+  os       String?
+  platform String?
+  browser  String?
 }
 
 model AuthorView {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  userId String @db.ObjectId
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  ip    String
-  agent String
+  ip    String?
+  device   String?
+  os       String?
+  platform String?
+  browser  String?
 }
+
