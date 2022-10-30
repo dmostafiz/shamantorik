@@ -230,4 +230,65 @@ module.exports = {
     deletePost: async (req, res) => {
 
     },
+
+    postLike: async (req, res) => {
+        
+        try {
+
+            const userId = req?.user?.id 
+
+            if(!userId) return res.json({ok: false})
+
+            const existingLike = await req.prisma.like.findFirst({
+                where: {
+                    authorId: userId,
+                    postId: req.params?.postId
+                }
+            })
+
+            if(existingLike){
+
+                const deleteLike = await req.prisma.like.delete({
+                    where: {
+                        id: existingLike.id
+                    }
+                })
+
+                return res.json({ok: true, likeStatus: 'unlike'})
+            }
+
+
+            const createLike = await req.prisma.like.create({
+                data: {
+                    authorId: userId,
+                    postId: req.params?.postId
+                }
+            })
+
+            return res.json({ok: true, likeStatus: 'like'})
+            
+        } catch (error) {
+            consoleLog('Post Like Error', error.message)
+        }
+    },
+
+    postImageUploader: async (req, res) => {
+        try {
+
+            // consoleLog('Req image', req.body)
+
+            const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
+                folder: 'post_image'
+            }) : null
+
+            consoleLog('imageUploadResult', imageUploadResult)
+    
+            res.json({location: imageUploadResult?.url})
+            
+        } catch (error) {
+            consoleLog('image upload error!', error.message)
+        }
+    }
+
+
 }

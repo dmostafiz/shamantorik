@@ -391,6 +391,7 @@ module.exports = {
                     },
 
                     select: {
+                        id: true,
                         userName: true,
                         fullName: true,
                         displayName: true,
