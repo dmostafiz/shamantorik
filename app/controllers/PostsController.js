@@ -52,7 +52,12 @@ module.exports = {
                 },
 
                 include: {
-                    author: true,
+                    author: {
+                        include: {
+                            posts: true,
+                            followers: true
+                        }
+                    },
                     comments: true,
                     views: true,
                     likes: true

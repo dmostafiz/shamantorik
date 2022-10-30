@@ -18,7 +18,7 @@ module.exports = {
         return res.json({ users, securedUser: req.user, isAdmin: req.isAdmin })
     },
 
-    
+
     getBlogger: async (req, res) => {
 
         const userId = req.params.userId
@@ -40,7 +40,8 @@ module.exports = {
                     avatar: true,
                     followers: true,
                     followings: true,
-                    comments: true,
+                    postComments: true,
+                    getComments: true,
                     views: true,
                     postLikes: true,
                     birthDate: true,
@@ -57,15 +58,15 @@ module.exports = {
                 }
             })
 
-            if(!user) return res.json({ok: false})
-    
-            return res.json({ok: true, user })
-            
+            if (!user) return res.json({ ok: false })
+
+            return res.json({ ok: true, user })
+
         } catch (error) {
 
             consoleLog('get blogger error', error.message)
-            res.json({ok: false})
-            
+            res.json({ ok: false })
+
         }
 
     },
@@ -109,9 +110,9 @@ module.exports = {
 
             console.log('user find: ', user)
 
-            if(user) return res.status(200).json({ok:true, msg: 'সদস্য পাওয়া গেছে'})
+            if (user) return res.status(200).json({ ok: true, msg: 'সদস্য পাওয়া গেছে' })
 
-            res.json({ok: false, msg: 'কোন সদস্য পাওয়া যায়নি'})
+            res.json({ ok: false, msg: 'কোন সদস্য পাওয়া যায়নি' })
 
         } catch (error) {
             consoleLog('TryCatch Error: ', error.message)
@@ -139,8 +140,8 @@ module.exports = {
 
             consoleLog('find author drafted posts', posts)
 
-            return res.json({ok: true, posts})
-            
+            return res.json({ ok: true, posts })
+
         } catch (error) {
             consoleLog('author drafted posts error', error.message)
         }
