@@ -20,7 +20,11 @@ module.exports = {
                 include: {
                     author: true,
                     views: true,
-                    comments: true,
+                    comments: {
+                        where: {
+                            type: 'post'
+                        }
+                    },
                     likes: true
                 }
             })
