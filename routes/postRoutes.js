@@ -1,5 +1,5 @@
 const { Router } = require("express")
-const { createPost, updatePost, getEditingPost, latestPost, getPostById, storePostTraffic, postLike, postImageUploader } = require("../app/controllers/PostsController")
+const { createPost, updatePost, getEditingPost, latestPost, getPostById, storePostTraffic, postLike, postImageUploader, storeComment, getPostComments } = require("../app/controllers/PostsController")
 const authMiddleware = require("../app/middlewares/authMiddleware")
 const softAuthMiddleware = require("../app/middlewares/softAuthMiddleware")
 const router = Router()
@@ -18,5 +18,8 @@ router.post('/like/:postId', [authMiddleware], postLike)
 
 router.post('/image_upload', postImageUploader)
 
+router.post('/store_comment', [authMiddleware], storeComment)
+
+router.get('/get_post_comments/:postId', getPostComments)
 
 module.exports = router

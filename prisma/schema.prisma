@@ -135,6 +135,9 @@ model Comment {
 
   childs Comment[] @relation("comment")
 
+  // post | reply
+  type String? @default("post")
+
   content String
 
   createdAt DateTime? @default(now())

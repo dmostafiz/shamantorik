@@ -35,7 +35,6 @@ module.exports = {
     },
 
     getPostBySlug: async (req, res) => {
-
     },
 
     getPostById: async (req, res) => {
@@ -228,16 +227,15 @@ module.exports = {
     },
 
     deletePost: async (req, res) => {
-
     },
 
     postLike: async (req, res) => {
-        
+
         try {
 
-            const userId = req?.user?.id 
+            const userId = req?.user?.id
 
-            if(!userId) return res.json({ok: false})
+            if (!userId) return res.json({ ok: false })
 
             const existingLike = await req.prisma.like.findFirst({
                 where: {
@@ -246,7 +244,7 @@ module.exports = {
                 }
             })
 
-            if(existingLike){
+            if (existingLike) {
 
                 const deleteLike = await req.prisma.like.delete({
                     where: {
@@ -254,7 +252,7 @@ module.exports = {
                     }
                 })
 
-                return res.json({ok: true, likeStatus: 'unlike'})
+                return res.json({ ok: true, likeStatus: 'unlike' })
             }
 
 
@@ -265,8 +263,8 @@ module.exports = {
                 }
             })
 
-            return res.json({ok: true, likeStatus: 'like'})
-            
+            return res.json({ ok: true, likeStatus: 'like' })
+
         } catch (error) {
             consoleLog('Post Like Error', error.message)
         }
@@ -282,13 +280,162 @@ module.exports = {
             }) : null
 
             consoleLog('imageUploadResult', imageUploadResult)
-    
-            res.json({location: imageUploadResult?.url})
-            
+
+            res.json({ location: imageUploadResult?.url })
+
         } catch (error) {
             consoleLog('image upload error!', error.message)
         }
-    }
+    },
+
+    storeComment: async (req, res) => {
+        try {
+
+            const {
+                content,
+                replyTo,
+                id
+            } = req.body
+
+            const userId = req.user?.id
+
+            if (!userId) return res.json({ ok: false, msg: 'দুঃখিত! আপনি অথরাইজড সদস্য নন।' })
+
+            if (replyTo == 'post') {
+
+                const post = await req.prisma.post.findFirst({
+                    where: {
+                        id: id
+                    }
+                })
+
+                if (!post) return res.json({ ok: false, msg: 'দুঃখিত! পোস্টটি খুজে পাওয়া যায়নি।' })
+
+                const comment = await req.prisma.comment.create({
+                    data: {
+                        authorId: userId,
+                        userId: post.authorId,
+                        postId: id,
+                        type: 'post',
+                        content: content
+                    }
+                })
+
+                if (!comment) res.json({ ok: false, msg: 'দুঃখিত! আবার চেষ্টা করুন।' })
+
+                return res.json({ ok: true, comment })
+
+            }
+
+            else if (replyTo == 'reply') {
+
+                const reply = await req.prisma.comment.findFirst({
+                    where: {
+                        id: id
+                    },
+                    include: {
+                        post: {
+                            select: {
+                                authorId: true
+                            }
+                        }
+                    }
+                })
+
+                if (!reply) return res.json({ ok: false, msg: 'দুঃখিত! মন্তব্যটি খুজে পাওয়া যায়নি।' })
+
+                const comment = await req.prisma.comment.create({
+                    data: {
+                        authorId: userId,
+                        userId: reply.post.authorId,
+                        postId: reply.postId,
+                        parentId: reply.id,
+                        type: 'reply',
+                        content: content
+                    }
+                })
+
+                if (!comment) res.json({ ok: false, msg: 'দুঃখিত! আবার চেষ্টা করুন।' })
+
+                return res.json({ ok: true, comment })
+
+            }
+
+        } catch (error) {
+            consoleLog('commenting error', error.message)
+            res.json({ ok: false, msg: 'দুঃখিত! আবার চেষ্টা করুন।' })
+        }
+    },
+
+    getPostComments: async (req, res) => {
+
+        const postId = req.params.postId
+
+        try {
+
+            const comments = await req.prisma.comment.findMany({
+                where: {
+                    postId: postId,
+                    type: 'post'
+                },
+
+                include: {
+
+                    childs: {
+
+                        include: {
+
+                            author: {
+
+                                select: {
+
+                                    displayName: true,
+                                    avatar: true,
+                                    createdAt: true,
+                                    updatedAt: true
+
+                                }
+                            },
+
+                            childs: {
+
+                                include: {
+
+                                    author: {
+
+                                        select: {
+
+                                            displayName: true,
+                                            avatar: true,
+                                            createdAt: true,
+                                            updatedAt: true
+
+                                        }
+                                    }
+                                }
+                            },
+                        }
+                    },
+
+                    author: {
+                        select: {
+                            displayName: true,
+                            avatar: true,
+                            createdAt: true,
+                            updatedAt: true
+                        }
+                    }
+                }
+            })
+
+            // consoleLog('comments', comments)
+
+            return res.json({ ok: true, comments })
+
+        } catch (error) {
+            consoleLog('get editing post error', error.message)
+        }
+    },
 
 
 }
