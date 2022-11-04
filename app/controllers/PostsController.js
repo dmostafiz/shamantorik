@@ -18,7 +18,12 @@ module.exports = {
                 },
 
                 include: {
-                    author: true,
+                    author: {
+                        include: {
+                            followers: true,
+                            posts: true
+                        }
+                    },
                     views: true,
                     comments: {
                         where: {
