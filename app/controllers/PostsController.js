@@ -25,7 +25,8 @@ module.exports = {
                             type: 'post'
                         }
                     },
-                    likes: true
+                    likes: true,
+                    categories: true
                 }
             })
 
@@ -383,9 +384,17 @@ module.exports = {
                     type: 'post'
                 },
 
+                orderBy: {
+                    createdAt: 'desc'
+                },
+
                 include: {
 
                     childs: {
+
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
 
                         include: {
 
@@ -402,6 +411,10 @@ module.exports = {
                             },
 
                             childs: {
+
+                                orderBy: {
+                                    createdAt: 'desc'
+                                },
 
                                 include: {
 
