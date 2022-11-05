@@ -44,6 +44,51 @@ module.exports = {
         }
     },
 
+    getTopPost: async (req, res) => {
+
+        try {
+
+            const limit = +req?.params?.limit
+
+            const posts = await req.prisma.post.findMany({
+
+                where: {
+                    status: 'published'
+                },
+
+                orderBy: {
+                    rank: 'desc'
+                },
+
+                take: limit,
+
+                include: {
+                    author: {
+                        include: {
+                            followers: true,
+                            posts: true
+                        }
+                    },
+                    views: true,
+                    comments: {
+                        where: {
+                            type: 'post'
+                        }
+                    },
+                    likes: true,
+                    categories: true
+                }
+            })
+
+            // consoleLog('latest posts', posts)
+
+            return res.json({ ok: true, posts })
+
+        } catch (error) {
+            consoleLog('latest posts error', error.message)
+        }
+    },
+
     getPostBySlug: async (req, res) => {
     },
 

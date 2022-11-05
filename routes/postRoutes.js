@@ -1,11 +1,13 @@
 const { Router } = require("express")
-const { createPost, updatePost, getEditingPost, latestPost, getPostById, storePostTraffic, postLike, postImageUploader, storeComment, getPostComments } = require("../app/controllers/PostsController")
+const { createPost, updatePost, getEditingPost, latestPost, getPostById, storePostTraffic, postLike, postImageUploader, storeComment, getPostComments, getTopPost } = require("../app/controllers/PostsController")
 const authMiddleware = require("../app/middlewares/authMiddleware")
 const softAuthMiddleware = require("../app/middlewares/softAuthMiddleware")
 const router = Router()
 
 router.get('/', latestPost)
 router.get('/getSinglePost/:postId', getPostById)
+
+router.get('/get_top_posts/:limit', getTopPost)
 
 router.post('/', [authMiddleware], createPost)
 router.get('/editing_post/:postId', [authMiddleware], getEditingPost)
