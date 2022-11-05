@@ -14,7 +14,7 @@ module.exports = {
                 },
 
                 orderBy: {
-                    createdAt: 'desc'
+                    publishedAt: 'desc'
                 },
 
                 include: {
@@ -72,7 +72,6 @@ module.exports = {
                     likes: true
                 }
             })
-
             // consoleLog('single post', post.views.length)
 
             if (post) return res.json({ ok: true, post })
@@ -129,6 +128,8 @@ module.exports = {
 
         try {
 
+            if (!req?.user?.id) return res.json({ ok: false })
+
             const slugify = (string) => {
                 const newText = string
                     .toLowerCase()
@@ -143,6 +144,32 @@ module.exports = {
             }) : null
 
             if (!req.user?.id) return res.json({ ok: false, msg: 'আপনি অথেনটিক নন!' })
+
+            // const checkPost = await req.prisma.post.findFirst({
+            //     where: {
+            //         id: req?.body?.id
+            //     }
+            // })
+
+            // if(checkPost){
+
+            // }
+
+            const checkPost = await req.prisma.post.findFirst({
+                where: {
+                    id: req?.body?.id
+                }
+            })
+
+            const updatePublished = (checkPost.hasPublished == false && req?.body?.status == 'published')
+                ? {
+                    hasPublished: true,
+                    publishedAt: new Date()
+                }
+
+                : undefined
+
+
 
             const post = await req.prisma.post.update({
                 where: {
@@ -160,11 +187,40 @@ module.exports = {
                             return { id: cat }
                         })
                     },
-                    status: req?.body?.status
+                    ...updatePublished,
+                    status: req?.body?.status,
                 }
             })
 
-            consoleLog('Post Updated', post)
+            if ((checkPost.hasPublished == false && req?.body?.status == 'published' && post)) {
+                await req.prisma.user.update({
+                    where: {
+                        id: req?.user.id
+                    },
+                    data: {
+                        rank: { increment: 5 }
+                    }
+                })
+
+                const imageRank = post.image ? 1 : 0
+                const titleRank = post.title ? 1 : 0
+                
+                const wordSpilit = post?.content?.split(" ")
+                const wordCountRant =  wordSpilit?.length > 49 ? 1 : wordSpilit?.length > 100 ? 2 :  wordSpilit?.length > 250 ? 3 : wordSpilit?.length > 500 ? 4 : wordSpilit?.length > 1000 ? 5 : 0
+
+                const newRank = imageRank + titleRank + wordCountRant
+
+                await req.prisma.post.update({
+                    where: {
+                        id: req?.body?.id
+                    },
+                    data: {
+                        rank: {
+                            increment: newRank
+                        }
+                    }
+                })
+            }
 
             return res.json({ ok: true, post })
 
@@ -254,6 +310,12 @@ module.exports = {
                 }
             })
 
+            const post = await req.prisma.post.findFirst({
+                where: {
+                    id: req.params?.postId
+                }
+            })
+
             if (existingLike) {
 
                 const deleteLike = await req.prisma.like.delete({
@@ -261,6 +323,40 @@ module.exports = {
                         id: existingLike.id
                     }
                 })
+
+                if (deleteLike && post.authorId != req?.user?.id) {
+                    // decrement user rank  ( who give like )
+                    await req.prisma.user.update({
+                        where: {
+                            id: req?.user?.id
+                        },
+                        data: {
+                            rank: { decrement: 1 }
+                        }
+                    })
+
+                    // decrement post rank
+                    const decrementPostRank = await req.prisma.post.update({
+                        where: {
+                            id: deleteLike.postId
+                        },
+                        data: {
+                            rank: { decrement: 2 }
+                        }
+                    })
+
+                    if (decrementPostRank) {
+                        // increment user rank ( who get like )
+                        await req.prisma.user.update({
+                            where: {
+                                id: decrementPostRank.authorId
+                            },
+                            data: {
+                                rank: { decrement: 1 }
+                            }
+                        })
+                    }
+                }
 
                 return res.json({ ok: true, likeStatus: 'unlike' })
             }
@@ -272,6 +368,41 @@ module.exports = {
                     postId: req.params?.postId
                 }
             })
+
+            if (createLike && post.authorId != req?.user?.id) {
+
+                // increment user rank  ( who give like )
+                await req.prisma.user.update({
+                    where: {
+                        id: createLike.authorId
+                    },
+                    data: {
+                        rank: { increment: 1 }
+                    }
+                })
+
+                // increment post rhank
+                const incrementPostRank = await req.prisma.post.update({
+                    where: {
+                        id: createLike.postId
+                    },
+                    data: {
+                        rank: { increment: 2 }
+                    }
+                })
+
+                if (incrementPostRank) {
+                    // increment user rank ( who get like )
+                    await req.prisma.user.update({
+                        where: {
+                            id: incrementPostRank.authorId
+                        },
+                        data: {
+                            rank: { increment: 1 }
+                        }
+                    })
+                }
+            }
 
             return res.json({ ok: true, likeStatus: 'like' })
 
@@ -321,6 +452,15 @@ module.exports = {
 
                 if (!post) return res.json({ ok: false, msg: 'দুঃখিত! পোস্টটি খুজে পাওয়া যায়নি।' })
 
+                const userCommentCount = await req.prisma.comment.findMany({
+                    where: {
+                        authorId: userId,
+                        userId: post.authorId,
+                        postId: id,
+                        type: 'post'
+                    }
+                })
+
                 const comment = await req.prisma.comment.create({
                     data: {
                         authorId: userId,
@@ -330,6 +470,45 @@ module.exports = {
                         content: content
                     }
                 })
+
+
+                if (comment && !userCommentCount.length && post.authorId != req?.user?.id) {
+
+                    // increment user rank  ( who give comment )
+                    await req.prisma.user.update({
+                        where: {
+                            id: comment.authorId
+                        },
+                        data: {
+                            rank: { increment: 2 }
+                        }
+                    })
+
+                    // increment post rank
+                    const incrementPostRank = await req.prisma.post.update({
+                        where: {
+                            id: comment.postId
+                        },
+                        data: {
+                            rank: { increment: 1 }
+                        }
+                    })
+
+                    if (incrementPostRank) {
+
+                        // increment user rank  ( who get comment )
+                        await req.prisma.user.update({
+                            where: {
+                                id: incrementPostRank.authorId
+                            },
+                            data: {
+                                rank: { increment: 1 }
+                            }
+                        })
+                    }
+
+
+                }
 
                 if (!comment) res.json({ ok: false, msg: 'দুঃখিত! আবার চেষ্টা করুন।' })
 
@@ -365,6 +544,20 @@ module.exports = {
                     }
                 })
 
+                if (comment && comment.authorId != reply.post.authorId) {
+
+                    // increment post
+                    await req.prisma.post.update({
+                        where: {
+                            id: comment.postId
+                        },
+                        data: {
+                            rank: { increment: 1 }
+                        }
+                    })
+
+                }
+
                 if (!comment) res.json({ ok: false, msg: 'দুঃখিত! আবার চেষ্টা করুন।' })
 
                 return res.json({ ok: true, comment })
@@ -375,6 +568,10 @@ module.exports = {
             consoleLog('commenting error', error.message)
             res.json({ ok: false, msg: 'দুঃখিত! আবার চেষ্টা করুন।' })
         }
+    },
+
+    deleteComment: async (req, res) => {
+
     },
 
     getPostComments: async (req, res) => {

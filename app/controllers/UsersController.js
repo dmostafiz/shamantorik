@@ -71,6 +71,67 @@ module.exports = {
 
     },
 
+    getTopBloggers: async (req, res) => {
+
+        const limit = +req?.params?.limit
+
+        try {
+            const users = await req.prisma.user.findMany({
+                where: {
+                    isActive: true,
+                    isNew: false,
+                    posts: {
+                        some: {
+                            status: 'published',
+                        },
+                    },
+                },
+                orderBy: {
+                    rank: 'desc'
+                },
+                take: limit,
+                select: {
+                    id: true,
+                    // userName: true,
+                    // email: true,
+                    fullName: true,
+                    displayName: true,
+                    bio: true,
+                    avatar: true,
+                    followers: true,
+                    followings: true,
+                    postComments: true,
+                    getComments: true,
+                    views: true,
+                    postLikes: true,
+                    birthDate: true,
+                    createdAt: true,
+                    gender: true,
+                    posts: {
+                        where: {
+                            status: 'published'
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        }
+                    }
+                }
+            })
+
+            if (!users) return res.json({ ok: false })
+
+            return res.json({ ok: true, users })
+
+        } catch (error) {
+
+            consoleLog('get top bloggers error', error.message)
+            res.json({ ok: false })
+
+        }
+
+    },
+
+
     checkUserExist: async (req, res) => {
         const { by, value } = req.body
 

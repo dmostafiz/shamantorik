@@ -40,6 +40,8 @@ model User {
 
   birthDate DateTime?
 
+  rank Int @default(0)
+
   // true, false
   isActive Boolean @default(false)
 
@@ -91,8 +93,13 @@ model Post {
 
   likes Like[]
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  rank Int @default(0)
+
+  hasPublished Boolean? @default(false)
+
+  publishedAt DateTime?
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
 }
 
 model Category {
@@ -103,6 +110,8 @@ model Category {
   description String?
 
   isAdmin Boolean @default(false)
+
+  rank Int @default(0)
 
   postIDs String[] @db.ObjectId
   posts   Post[]   @relation(fields: [postIDs], references: [id])
@@ -138,6 +147,8 @@ model Comment {
   // post | reply
   type String? @default("post")
 
+  rank Int @default(0)
+
   content String
 
   createdAt DateTime? @default(now())
@@ -153,7 +164,7 @@ model PostView {
   userId String? @db.ObjectId
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  ip    String?
+  ip       String?
   device   String?
   os       String?
   platform String?
@@ -166,10 +177,9 @@ model AuthorView {
   userId String? @db.ObjectId
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  ip    String?
+  ip       String?
   device   String?
   os       String?
   platform String?
   browser  String?
 }
-
