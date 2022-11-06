@@ -700,5 +700,49 @@ module.exports = {
         }
     },
 
+    getLatestComments: async (req, res) => {
+
+        const limit = +req.params.limit
+
+        try {
+
+            const comments = await req.prisma.comment.findMany({
+                where: {
+                    type: 'post'
+                },
+
+                take: limit,
+
+                orderBy: {
+                    createdAt: 'desc'
+                },
+
+                include: {
+
+                    post: true,
+                    
+
+                    author: {
+                        select: {
+                            displayName: true,
+                            avatar: true,
+                            posts: true,
+                            followers: true,
+                            createdAt: true,
+                            updatedAt: true
+                        },
+                    }
+                }
+            })
+
+            // consoleLog('comments', comments)
+
+            return res.json({ ok: true, comments })
+
+        } catch (error) {
+            consoleLog('get editing post error', error.message)
+        }
+    },
+    
 
 }
