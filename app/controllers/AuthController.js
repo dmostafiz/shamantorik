@@ -9,7 +9,7 @@ module.exports = {
 
         const { email, password } = req.body
 
-        consoleLog('Login User ', email, password)
+        console.log('Login User ', email, password)
 
         try {
 
@@ -25,21 +25,25 @@ module.exports = {
                     userName: true,
                     fullName: true,
                     displayName: true,
-                    email:true,
+                    email: true,
                     avatar: true,
+                    password: true
                     // isNew: true,
                     // isActive: true,
                     // role: true
                 }
             })
 
-            consoleLog('Login User', user)
+            consoleLog('Login User pass', user.password)
 
             if (!user) return res.send({ ok: false, msg: 'একাঊন্ট খুজে পাওয়া যায়নি' })
 
             const compare = await bcrypt.compare(password, user.password)
 
+            // consoleLog('fucking online user', compare)
+
             if (!compare) return res.send({ ok: false, msg: 'পাসওয়ার্ড সঠিক নয়' })
+
 
             if (user.isNew == true) {
 
@@ -55,8 +59,17 @@ module.exports = {
 
             }
 
-            const accessToken = jwtSignAccessToken(user, '1d')
-            const refreshToken = jwtSignRefreshToken(user, '1y')
+            const tokenUser = {
+                id: user.id,
+                userName: user.userName,
+                fullName: user.fullName,
+                displayName: user.displayName,
+                email: user.email,
+                avatar: user.avatar
+            }
+
+            const accessToken = jwtSignAccessToken(tokenUser, '1d')
+            const refreshToken = jwtSignRefreshToken(tokenUser, '1y')
 
             setRefreshTokenCookie(res, refreshToken)
 
@@ -79,13 +92,13 @@ module.exports = {
             const user = await req.prisma.user.findFirst({
                 where: {
                     email: email
-                }, 
+                },
                 select: {
                     id: true,
                     userName: true,
                     fullName: true,
                     displayName: true,
-                    email:true,
+                    email: true,
                     avatar: true,
                     // isNew: true,
                     // isActive: true,
@@ -403,7 +416,12 @@ module.exports = {
                         gender: true,
                         gender: true,
                         createdAt: true,
-                        updatedAt: true
+                        updatedAt: true,
+                        posts: {
+                            where: {
+                                status: 'published'
+                            }
+                        }
                     }
                 })
 
@@ -446,9 +464,9 @@ module.exports = {
             // consoleLog('check post author', post)
 
 
-            if (!post) return res.json({ok: false})
+            if (!post) return res.json({ ok: false })
 
-            return res.json({ ok: true, post})
+            return res.json({ ok: true, post })
 
         } catch (error) {
             consoleLog('check post author error', error.message)

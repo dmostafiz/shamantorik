@@ -13,7 +13,84 @@ const { PrismaClient } = require('@prisma/client');
 const consoleLog = require('./app/Helpers/consoleLog');
 const useragent = require('express-useragent')
 
+var http = require("http");
+var socketio = require("socket.io");
 var app = express();
+
+// Create the http server
+const server = require('http').createServer(app);
+
+// Create the Socket IO server on 
+// the top of http server
+const io = socketio(server, {
+  cors: {
+    origin: '*'
+  }
+});
+
+let users = []
+
+const addUser = (user, socketId) => {
+  !users.some(usr => usr.socketId == socketId) && users.push({ ...user, socketId })
+}
+
+const removeUser = (socketId) => {
+
+  consoleLog('removing socket id', socketId)
+
+  users = users.filter(usr => usr.socketId != socketId)
+}
+
+
+io.on('connection', socket => {
+  //Take user ID and Socket ID
+  consoleLog('Socket client connected with server', '')
+
+  // When a user connect
+  socket.on('addUser', (user) => {
+
+    // consoleLog('Socket user added', user)
+
+    addUser(user, socket.id)
+
+    io.emit('socketUsers', users)
+
+  })
+
+
+  // const getUser = (userId) => {
+  //     return users.find(user => user.userId == userId)
+  // }
+
+  // socket.on('messageSent', async ({ senderId, receiverId, message }) => {
+  //     const user = getUser(receiverId)
+  //     io.to(user?.socketId).emit('messageReceived', { senderId, message })
+  //     io.emit('updateMessanger', senderId)
+  // })
+
+  // socket.on('userTyping', async ({ senderId, receiverId }) => {
+
+  //     const user = getUser(receiverId)
+
+  //     io.to(user?.socketId).emit('userTypingReceived', senderId)
+
+  // })
+
+  // appSocket(io, socket)
+
+  // When a user disconnect
+  socket.on('disconnect', () => {
+
+    console.log('Socket client disconnected from server')
+
+     removeUser(socket.id)
+
+    io.emit('socketUsers', users)
+  })
+
+
+})
+
 
 app.set('trust proxy', 1)
 
@@ -77,7 +154,7 @@ app.use(function (req, res, next) {
 
 
 app.use(function (req, res, next) {
-  
+
   const ua = useragent.parse(req.headers['user-agent'])
 
   const device = ua.isAndroid ? 'phone'
@@ -117,4 +194,4 @@ require('./routes')(app)
 //   next(createError(404));
 // });
 
-module.exports = app;
+module.exports = { app, server };

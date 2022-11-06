@@ -647,7 +647,7 @@ module.exports = {
                             author: {
 
                                 select: {
-
+                                    id: true,
                                     displayName: true,
                                     avatar: true,
                                     createdAt: true,
@@ -667,7 +667,7 @@ module.exports = {
                                     author: {
 
                                         select: {
-
+                                            id: true,
                                             displayName: true,
                                             avatar: true,
                                             createdAt: true,
@@ -682,6 +682,7 @@ module.exports = {
 
                     author: {
                         select: {
+                            id: true,
                             displayName: true,
                             avatar: true,
                             createdAt: true,
@@ -724,6 +725,7 @@ module.exports = {
 
                     author: {
                         select: {
+                            id: true,
                             displayName: true,
                             avatar: true,
                             posts: true,
