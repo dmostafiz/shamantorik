@@ -177,7 +177,6 @@ module.exports = {
 
             const slugify = (string) => {
                 const newText = string
-                    .toLowerCase()
                     .replace(/ /g, "-")
                 // .replace(/[^\w-]+/g, "");
 
