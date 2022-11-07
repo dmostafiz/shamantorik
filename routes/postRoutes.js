@@ -26,5 +26,4 @@ router.get('/get_post_comments/:postId', getPostComments)
 
 router.get('/latest_comments/:limit', getLatestComments)
 
-
 module.exports = router

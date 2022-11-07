@@ -206,6 +206,81 @@ module.exports = {
         } catch (error) {
             consoleLog('author drafted posts error', error.message)
         }
+    },
+
+    getUserNotification: async (req, res) => {
+        try {
+
+            const notifications = await req.prisma.notification.findMany({
+
+                where: {
+                    userId: req.user.id,
+                    seen: false
+                },
+
+                include: {
+                    sender: {
+                        select: {
+                            displayName: true,
+                            avatar: true
+                        }
+                    },
+                }
+            })
+
+            return res.json({ ok: true, notifications })
+
+        } catch (error) {
+            consoleLog('notification error', error.message)
+        }
+    },
+
+    seenUserNotification: async (req, res) => {
+        try {
+
+            const notifications = await req.prisma.notification.updateMany({
+
+                where: {
+                    userId: req.user.id,
+                    seen: false
+                },
+
+                data: {
+                    seen: true,
+                }
+
+            })
+
+            return res.json({ ok: true, notifications })
+
+        } catch (error) {
+            consoleLog('notification error', error.message)
+        }
+    },
+
+    seenOneNotification: async (req, res) => {
+        try {
+
+            const notificationId = req.params.notificationId
+
+            const not = await req.prisma.notification.updateMany({
+                where: {
+                    id: notificationId,
+                    userId: req.user.id
+                },
+
+                data: {
+                    seen: true
+                }
+            })
+
+            console.log('not', not)
+
+            return res.json({ ok: true })
+
+        } catch (error) {
+            consoleLog('seenNotification Error', error.message)
+        }
     }
 
 }

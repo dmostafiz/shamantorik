@@ -108,7 +108,14 @@ module.exports = {
                 include: {
                     author: {
                         include: {
-                            posts: true,
+                            posts: {
+                                where: {
+                                    status: 'published'
+                                },
+                                orderBy: {
+                                    publishedAt: 'desc'
+                                }
+                            },
                             followers: true
                         }
                     },
@@ -448,18 +455,20 @@ module.exports = {
                 }
 
                 if (createLike.authorId != incrementPostRank.authorId) {
+
                     await req.prisma.notification.create({
                         data: {
                             senderId: createLike.authorId,
                             userId: incrementPostRank.authorId,
                             postId: incrementPostRank.id,
                             likeId: createLike.id,
-                            text: 'আপনার পোস্ট এ লাইক দিয়েছেন',
+                            text: `"${post.title}" পোস্ট এ লাইক দিয়েছেন`,
                             link: `/blog/${incrementPostRank.id}`,
                             type: 'like',
                             seen: false,
                         }
                     })
+
                 }
 
             }
@@ -568,6 +577,20 @@ module.exports = {
                     }
 
 
+                }
+
+                if(comment && post.authorId != req?.user?.id){
+                    await req.prisma.notification.create({
+                        data: {
+                            senderId: comment.authorId,
+                            userId: post.authorId,
+                            postId: post.id,
+                            text:  `"${post.title}" পোস্ট এ মন্তব্য করেছেন`,
+                            link: `/blog/${post.id}`,
+                            type: 'like',
+                            seen: false,
+                        }
+                    })
                 }
 
                 if (!comment) res.json({ ok: false, msg: 'দুঃখিত! আবার চেষ্টা করুন।' })
