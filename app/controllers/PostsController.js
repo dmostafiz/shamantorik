@@ -248,9 +248,9 @@ module.exports = {
 
                 const imageRank = post.image ? 1 : 0
                 const titleRank = post.title ? 1 : 0
-                
+
                 const wordSpilit = post?.content?.split(" ")
-                const wordCountRant =  wordSpilit?.length > 49 ? 1 : wordSpilit?.length > 100 ? 2 :  wordSpilit?.length > 250 ? 3 : wordSpilit?.length > 500 ? 4 : wordSpilit?.length > 1000 ? 5 : 0
+                const wordCountRant = wordSpilit?.length > 49 ? 1 : wordSpilit?.length > 100 ? 2 : wordSpilit?.length > 250 ? 3 : wordSpilit?.length > 500 ? 4 : wordSpilit?.length > 1000 ? 5 : 0
 
                 const newRank = imageRank + titleRank + wordCountRant
 
@@ -446,6 +446,22 @@ module.exports = {
                         }
                     })
                 }
+
+                if (createLike.authorId != incrementPostRank.authorId) {
+                    await req.prisma.notification.create({
+                        data: {
+                            senderId: createLike.authorId,
+                            userId: incrementPostRank.authorId,
+                            postId: incrementPostRank.id,
+                            likeId: createLike.id,
+                            text: 'আপনার পোস্ট এ লাইক দিয়েছেন',
+                            link: `/blog/${incrementPostRank.id}`,
+                            type: 'like',
+                            seen: false,
+                        }
+                    })
+                }
+
             }
 
             return res.json({ ok: true, likeStatus: 'like' })
@@ -721,7 +737,7 @@ module.exports = {
                 include: {
 
                     post: true,
-                    
+
 
                     author: {
                         select: {
@@ -745,6 +761,6 @@ module.exports = {
             consoleLog('get editing post error', error.message)
         }
     },
-    
+
 
 }

@@ -30,6 +30,12 @@ model User {
   followingIds String[] @db.ObjectId
   followings   User[]   @relation(name: "followers", fields: [followingIds], references: [id])
 
+  sendingNotificationIds String[]       @db.ObjectId
+  sendingNotifications   Notification[] @relation(name: "sender")
+
+  notificationIds String[]       @db.ObjectId
+  notifications   Notification[] @relation(name: "receiver")
+
   views AuthorView[]
 
   postLikes Like[]
@@ -98,8 +104,8 @@ model Post {
   hasPublished Boolean? @default(false)
 
   publishedAt DateTime?
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
 }
 
 model Category {
@@ -150,6 +156,33 @@ model Comment {
   rank Int @default(0)
 
   content String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Notification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  senderId String? @db.ObjectId
+  sender   User?   @relation(name: "sender", fields: [senderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  userId String? @db.ObjectId
+  user   User?   @relation(name: "receiver", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  commentId String?
+  postId    String?
+  likeId    String?
+
+  text String?
+  link String?
+
+  count Int @default(0)
+
+  // like | comment | reply
+  type String?
+
+  seen Boolean @default(false)
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
