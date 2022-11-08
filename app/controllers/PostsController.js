@@ -585,9 +585,10 @@ module.exports = {
                             senderId: comment.authorId,
                             userId: post.authorId,
                             postId: post.id,
+                            commentId: comment.id,
                             text:  `"${post.title}" পোস্ট এ মন্তব্য করেছেন`,
                             link: `/blog/${post.id}`,
-                            type: 'like',
+                            type: 'comment',
                             seen: false,
                         }
                     })

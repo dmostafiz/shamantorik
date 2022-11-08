@@ -40,8 +40,26 @@ module.exports = {
                     avatar: true,
                     followers: true,
                     followings: true,
-                    postComments: true,
-                    getComments: true,
+                    postComments: {
+                        take: 5,
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
+                        include: {
+                            author: true,
+                            post: true
+                        }
+                    },
+                    getComments: {
+                        take: 5,
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
+                        include: {
+                            author: true,
+                            post: true
+                        }
+                    },
                     views: true,
                     postLikes: true,
                     birthDate: true,
@@ -53,6 +71,9 @@ module.exports = {
                         },
                         orderBy: {
                             createdAt: 'desc'
+                        },
+                        include: {
+                            categories: true,
                         }
                     }
                 }
@@ -216,6 +237,10 @@ module.exports = {
                 where: {
                     userId: req.user.id,
                     seen: false
+                },
+
+                orderBy: {
+                  createdAt: 'desc'
                 },
 
                 include: {
