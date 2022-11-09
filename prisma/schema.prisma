@@ -46,6 +46,8 @@ model User {
 
   birthDate DateTime?
 
+  birthPlace String?
+
   rank Int @default(0)
 
   // true, false

@@ -1,4 +1,6 @@
 const cookie = require('cookie');
+const bcrypt = require('bcryptjs');
+const Cloudinary = require('../Helpers/Cloudinary');
 const consoleLog = require('../Helpers/consoleLog');
 
 module.exports = {
@@ -64,6 +66,7 @@ module.exports = {
                     postLikes: true,
                     birthDate: true,
                     createdAt: true,
+                    birthPlace: true,
                     gender: true,
                     posts: {
                         where: {
@@ -207,7 +210,6 @@ module.exports = {
     },
 
     deleteUser: async (req, res) => {
-
     },
 
     getAuthDraftedPosts: async (req, res) => {
@@ -306,6 +308,143 @@ module.exports = {
         } catch (error) {
             consoleLog('seenNotification Error', error.message)
         }
-    }
+    },
+
+    getUserAccount: async (req, res) => {
+        const userId = req.user.id
+
+        try {
+            const user = await req.prisma.user.findFirst({
+                where: {
+                    id: userId,
+                    isActive: true,
+                    isNew: false
+                },
+                select: {
+                    id: true,
+                    userName: true,
+                    email: true,
+                    fullName: true,
+                    displayName: true,
+                    bio: true,
+                    avatar: true,
+                    followers: true,
+                    followings: true,
+                    postComments: {
+                        take: 5,
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
+                        include: {
+                            author: true,
+                            post: true
+                        }
+                    },
+                    getComments: {
+                        take: 5,
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
+                        include: {
+                            author: true,
+                            post: true
+                        }
+                    },
+                    views: true,
+                    postLikes: true,
+                    birthDate: true,
+                    birthPlace: true,
+                    createdAt: true,
+                    gender: true,
+                    posts: {
+                        where: {
+                            status: 'published'
+                        },
+                        orderBy: {
+                            createdAt: 'desc'
+                        },
+                        include: {
+                            categories: true,
+                        }
+                    }
+                }
+            })
+
+            if (!user) return res.json({ ok: false })
+
+            return res.json({ ok: true, user })
+
+        } catch (error) {
+
+            consoleLog('get blogger error', error.message)
+            res.json({ ok: false })
+
+        }
+    },
+
+    updateProfileInfo: async (req, res) => {
+
+        try {
+
+            const user = req.user
+
+            if(!user?.id) return res.json({ok: false})
+
+            const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
+                folder: 'profile_images'
+            }) : null
+
+            consoleLog('imageUploadResult ', imageUploadResult)
+
+            const findUser = await req.prisma.user.findFirst({
+                where: {
+                    id: user.id
+                }
+            })
+
+            if(!findUser) return res.json({ok: false})
+
+            const emailExists = await req.prisma.user.findFirst({
+                where: {
+                    id: {
+                        not: user.id
+                    },
+                    email: req.body.email
+                }
+            })
+
+            if(emailExists) return res.json({ok: false, msg: 'ইমেইলটি অন্য একজন ব্যাবহার করছেন'})
+
+            const updateUser = await req.prisma.user.update({
+                where: {
+                    id: user.id
+                },
+
+                data: {
+                    avatar: imageUploadResult?.url || findUser.avatar,
+                    fullName: req.body.fullName,
+                    displayName: req.body.displayName,
+                    email: req.body.email,
+                    gender: req.body.gender,
+                    birthDate: new Date(req.body.birthDate).toISOString(),
+                    birthPlace: req.body.birthPlace,
+                    bio: req.body.bio,
+                }
+            })
+
+            consoleLog('updateUser ', updateUser)
+
+            return res.status(200).send({ ok: true, user: updateUser })
+
+        } catch (error) {
+
+            consoleLog('Profile update error', error.message)
+
+            return res.status(500).send({ ok: false, msg: error.message })
+
+        }
+
+
+    },
 
 }
