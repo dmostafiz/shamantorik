@@ -101,9 +101,9 @@ app.disable('x-powered-by')
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://bengalread.vercel.app',
-    'https://bengalread.netlify.app',
-    'https://bengalread.com',
+    'https://shamantorik.vercel.app',
+    'https://shamantorik.netlify.app',
+    'https://shamantorik.com',
   ],
   credentials: true,
 }))
