@@ -1,5 +1,5 @@
 const { Router } = require("express")
-const { checkUserExist, getAuthDraftedPosts, getBlogger, getTopBloggers, getUserNotification, seenUserNotification, seenOneNotification, getUserAccount, updateProfileInfo } = require("../app/controllers/UsersController")
+const { checkUserExist, getAuthDraftedPosts, getBlogger, getTopBloggers, getUserNotification, seenUserNotification, seenOneNotification, getUserAccount, updateProfileInfo, getBloggerPosts } = require("../app/controllers/UsersController")
 const authMiddleware = require("../app/middlewares/authMiddleware")
 
 const router = Router()
@@ -10,6 +10,8 @@ router.get('/profile', (req, res) => {
 })
 
 router.get('/blogger/:userId', getBlogger)
+
+router.get('/blogger/posts/:userId', getBloggerPosts)
 
 router.get('/get_top_ranked/:limit', getTopBloggers)
 

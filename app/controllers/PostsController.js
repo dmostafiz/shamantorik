@@ -7,7 +7,16 @@ module.exports = {
 
         try {
 
+            // const cursor = typeof req.params.cursor === undefined || req.params.cursor === NaN ? 0 : parseInt(req.params.cursor)
+            const limit = parseInt(req.query.limit)
+            const cursor = parseInt(req.query.cursor)
+
+            // console.log('cursor', req.query.cursor)
+
             const posts = await req.prisma.post.findMany({
+
+                skip: cursor,
+                take: limit,
 
                 where: {
                     status: 'published'
@@ -37,7 +46,11 @@ module.exports = {
 
             // consoleLog('latest posts', posts)
 
-            return res.json({ ok: true, posts })
+            const nextCursor = posts.length
+
+            console.log('nextCursor', nextCursor)
+
+            return res.json({ ok: true, posts, nextCursor })
 
         } catch (error) {
             consoleLog('latest posts error', error.message)
@@ -268,6 +281,19 @@ module.exports = {
                     data: {
                         rank: {
                             increment: newRank
+                        }
+                    }
+                })
+
+                const catRank = await req.prisma.category.updateMany({
+                    where: {
+                        id: {
+                            in: req?.body?.categories
+                        }
+                    },
+                    data: {
+                        rank: {
+                            increment: 1
                         }
                     }
                 })
@@ -579,14 +605,14 @@ module.exports = {
 
                 }
 
-                if(comment && post.authorId != req?.user?.id){
+                if (comment && post.authorId != req?.user?.id) {
                     await req.prisma.notification.create({
                         data: {
                             senderId: comment.authorId,
                             userId: post.authorId,
                             postId: post.id,
                             commentId: comment.id,
-                            text:  `"${post.title}" পোস্ট এ মন্তব্য করেছেন`,
+                            text: `"${post.title}" পোস্ট এ মন্তব্য করেছেন`,
                             link: `/blog/${post.id}`,
                             type: 'comment',
                             seen: false,

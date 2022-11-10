@@ -5,6 +5,7 @@ const softAuthMiddleware = require("../app/middlewares/softAuthMiddleware")
 const router = Router()
 
 router.get('/', latestPost)
+
 router.get('/getSinglePost/:postId', getPostById)
 
 router.get('/get_top_posts/:limit', getTopPost)

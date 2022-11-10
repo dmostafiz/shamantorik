@@ -95,6 +95,61 @@ module.exports = {
 
     },
 
+    getBloggerPosts: async (req, res) => {
+
+        const userId = req.params.userId
+
+        try {
+
+            const limit = parseInt(req.query.limit)
+            const cursor = parseInt(req.query.cursor)
+
+            console.log('cursor', req.query.cursor)
+
+            const posts = await req.prisma.post.findMany({
+
+                skip: cursor,
+                take: limit,
+
+                where: {
+                    authorId: userId,
+                    status: 'published'
+                },
+
+                orderBy: {
+                    publishedAt: 'desc'
+                },
+
+                include: {
+                    author: {
+                        include: {
+                            followers: true,
+                            posts: true
+                        }
+                    },
+                    views: true,
+                    comments: {
+                        where: {
+                            type: 'post'
+                        }
+                    },
+                    likes: true,
+                    categories: true
+                }
+            })
+
+
+            return res.json({ ok: true, posts })
+
+        } catch (error) {
+
+            consoleLog('get blogger error', error.message)
+            res.json({ ok: false })
+
+        }
+
+    },
+
     getTopBloggers: async (req, res) => {
 
         const limit = +req?.params?.limit
