@@ -104,6 +104,7 @@ app.use(cors({
     'https://shamantorik.vercel.app',
     'https://shamantorik.netlify.app',
     'https://shamantorik.com',
+    'https://www.shamantorik.com'
   ],
   credentials: true,
 }))
