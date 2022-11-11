@@ -303,6 +303,7 @@ module.exports = {
 
         } catch (error) {
             consoleLog('post update error', error.message)
+            return res.json({ok: false})
         }
 
     },

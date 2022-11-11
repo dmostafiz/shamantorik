@@ -387,6 +387,9 @@ module.exports = {
                     followings: true,
                     postComments: {
                         take: 5,
+                        where: {
+                            type: 'post'
+                        },
                         orderBy: {
                             createdAt: 'desc'
                         },
@@ -397,6 +400,9 @@ module.exports = {
                     },
                     getComments: {
                         take: 5,
+                        where: {
+                            type: 'post'
+                        },
                         orderBy: {
                             createdAt: 'desc'
                         },
