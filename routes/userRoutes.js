@@ -1,5 +1,5 @@
 const { Router } = require("express")
-const { checkUserExist, getAuthDraftedPosts, getBlogger, getTopBloggers, getUserNotification, seenUserNotification, seenOneNotification, getUserAccount, updateProfileInfo, getBloggerPosts } = require("../app/controllers/UsersController")
+const { checkUserExist, getAuthDraftedPosts, getBlogger, getTopBloggers, getUserNotification, seenUserNotification, seenOneNotification, getUserAccount, updateProfileInfo, getBloggerPosts, getUserStepPosts } = require("../app/controllers/UsersController")
 const authMiddleware = require("../app/middlewares/authMiddleware")
 
 const router = Router()
@@ -28,5 +28,7 @@ router.post('/seen_notification/:notificationId', [authMiddleware], seenOneNotif
 router.get('/user_account', [authMiddleware], getUserAccount)
 
 router.post('/update_profile_info',[authMiddleware], updateProfileInfo)
+
+router.get('/stepPosts/:userId', getUserStepPosts)
 
 module.exports = router

@@ -511,4 +511,32 @@ module.exports = {
 
     },
 
+    getUserStepPosts: async (req, res) => {
+        try {
+
+            const userId = req.params.userId
+
+            consoleLog('step posts user id', userId)
+
+            const posts = await req.prisma.post.findMany({
+                where: {
+                    authorId: userId,
+                    hasPublished: true,
+                    status: 'published',
+                    postType: 'multiStep',
+                    part: 1
+                },
+                include: {
+                    childs: true
+                }
+            })
+
+            return res.json({ok: true, posts})
+            
+        } catch (error) {
+            consoleLog('getUserStepPosts', error.message)
+            return res.json({ok: false, posts: []})
+        }
+    }
+
 }

@@ -27,20 +27,38 @@ module.exports = {
                 },
 
                 include: {
+
                     author: {
                         include: {
                             followers: true,
                             posts: true
                         }
                     },
+
                     views: true,
+                    
                     comments: {
                         where: {
                             type: 'post'
                         }
                     },
+
                     likes: true,
-                    categories: true
+
+                    categories: true,
+
+                    parent: {
+                        include: {
+                            childs: {
+                                where: {
+                                    status: 'published'
+                                }
+                            }
+                        }
+                    },
+
+                    childs: true
+                    
                 }
             })
 
@@ -134,7 +152,16 @@ module.exports = {
                     },
                     comments: true,
                     views: true,
-                    likes: true
+                    likes: true,
+                    parent: {
+                        include: {
+                            childs: {
+                                where: {
+                                    status: 'published'
+                                }
+                            }
+                        }
+                    }
                 }
             })
             // consoleLog('single post', post.views.length)
@@ -177,6 +204,13 @@ module.exports = {
             const post = await req.prisma.post.findFirst({
                 where: {
                     id: postId
+                },
+                include: {
+                    parent: {
+                        include: {
+                            childs: true
+                        }
+                    }
                 }
             })
 
@@ -195,13 +229,13 @@ module.exports = {
 
             if (!req?.user?.id) return res.json({ ok: false })
 
-            const slugify = (string) => {
-                const newText = string
-                    .replace(/ /g, "-")
-                // .replace(/[^\w-]+/g, "");
+            // const slugify = (string) => {
+            //     const newText = string
+            //         .replace(/ /g, "-")
+            //     // .replace(/[^\w-]+/g, "");
 
-                return newText
-            };
+            //     return newText
+            // };
 
             const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
                 folder: 'profile_images'
@@ -241,7 +275,7 @@ module.exports = {
                 },
                 data: {
                     title: req?.body?.title,
-                    slug: slugify(req?.body?.title),
+                    slug: null,
                     content: req?.body?.content,
                     image: imageUploadResult?.url,
                     postType: req?.body?.postType,
@@ -257,6 +291,7 @@ module.exports = {
             })
 
             if ((checkPost.hasPublished == false && req?.body?.status == 'published' && post)) {
+
                 await req.prisma.user.update({
                     where: {
                         id: req?.user.id
@@ -302,8 +337,8 @@ module.exports = {
             return res.json({ ok: true, post })
 
         } catch (error) {
-            consoleLog('post update error', error.message)
-            return res.json({ok: false})
+            consoleLog('post update error', error)
+            return res.json({ ok: false })
         }
 
     },
