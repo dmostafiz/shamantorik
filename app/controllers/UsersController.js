@@ -67,6 +67,7 @@ module.exports = {
                     birthDate: true,
                     createdAt: true,
                     birthPlace: true,
+                    profession: true,
                     gender: true,
                     posts: {
                         where: {
@@ -416,6 +417,7 @@ module.exports = {
                     birthDate: true,
                     birthPlace: true,
                     createdAt: true,
+                    profession: true,
                     gender: true,
                     posts: {
                         where: {
@@ -489,6 +491,7 @@ module.exports = {
                     gender: req.body.gender,
                     birthDate: new Date(req.body.birthDate).toISOString(),
                     birthPlace: req.body.birthPlace,
+                    profession: req.body.profession,
                     bio: req.body.bio,
                 }
             })

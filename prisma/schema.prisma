@@ -48,6 +48,8 @@ model User {
 
   birthPlace String?
 
+  profession String?
+
   rank Int @default(0)
 
   // true, false
