@@ -54,6 +54,9 @@ module.exports = {
                     },
                     getComments: {
                         take: 5,
+                        where: {
+                            isDeleted: false    
+                        },
                         orderBy: {
                             createdAt: 'desc'
                         },
@@ -71,7 +74,10 @@ module.exports = {
                     gender: true,
                     posts: {
                         where: {
-                            status: 'published'
+                            status: 'published',
+                            hasPublished: true,
+                            isDeleted: false,
+                            isDeclined: false,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -114,7 +120,10 @@ module.exports = {
 
                 where: {
                     authorId: userId,
-                    status: 'published'
+                    status: 'published',
+                    hasPublished: true,
+                    isDeleted: false,
+                    isDeclined: false,
                 },
 
                 orderBy: {
@@ -163,6 +172,9 @@ module.exports = {
                     posts: {
                         some: {
                             status: 'published',
+                            hasPublished: true,
+                            isDeleted: false,
+                            isDeclined: false,
                         },
                     },
                 },
@@ -181,7 +193,11 @@ module.exports = {
                     followers: true,
                     followings: true,
                     postComments: true,
-                    getComments: true,
+                    getComments: {
+                        where: {
+                            isDeleted: false
+                        }
+                    },
                     views: true,
                     postLikes: true,
                     birthDate: true,
@@ -189,7 +205,10 @@ module.exports = {
                     gender: true,
                     posts: {
                         where: {
-                            status: 'published'
+                            status: 'published',
+                            hasPublished: true,
+                            isDeleted: false,
+                            isDeclined: false,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -274,7 +293,8 @@ module.exports = {
             const posts = await req.prisma.post.findMany({
                 where: {
                     authorId: req.user.id,
-                    status: 'drafted'
+                    status: 'drafted',
+                    isDeleted: false
                 }
             })
 
@@ -402,7 +422,8 @@ module.exports = {
                     getComments: {
                         take: 5,
                         where: {
-                            type: 'post'
+                            type: 'post',
+                            isDeleted: false
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -421,7 +442,10 @@ module.exports = {
                     gender: true,
                     posts: {
                         where: {
-                            status: 'published'
+                            status: 'published',
+                            hasPublished: true,
+                            isDeleted: false,
+                            isDeclined: false,
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -522,8 +546,11 @@ module.exports = {
                 where: {
                     authorId: userId,
                     hasPublished: true,
-                    status: 'published',
                     postType: 'multiStep',
+                    status: 'published',
+                    hasPublished: true,
+                    isDeleted: false,
+                    isDeclined: false,
                     part: 1
                 },
                 include: {
@@ -537,6 +564,183 @@ module.exports = {
             consoleLog('getUserStepPosts', error.message)
             return res.json({ok: false, posts: []})
         }
+    },
+
+    getUserPublishedPosts: async (req, res) => {
+        try {
+
+            const userId = req.user.id 
+
+            const posts = await req.prisma.post.findMany({
+                where: {
+                    authorId: userId,
+                    status: 'published',
+                    isDeleted: false,
+                },
+                orderBy: {
+                  publishedAt: 'desc'
+                },
+                include: {
+                    comments: true,
+                    views: true,
+                    likes: true
+                }
+            })
+
+
+            res.json({ok: true, posts: posts})
+            
+        } catch (error) {
+            consoleLog('getUserPublishedPosts error', error)
+            res.json({ok: false, posts: []})
+        }
+    },
+
+    getUserTrashedPosts: async (req, res) => {
+        try {
+
+            const userId = req.user.id 
+
+            const posts = await req.prisma.post.findMany({
+                where: {
+                    authorId: userId,
+                    isDeleted: true
+                },
+                orderBy: {
+                  publishedAt: 'desc'
+                }
+            })
+
+
+            res.json({ok: true, posts: posts})
+            
+        } catch (error) {
+            consoleLog('getUserTrashedPosts error', error)
+            res.json({ok: false, posts: []})
+        }
+    },
+
+    trashPost: async (req, res) => {
+        try {
+
+            const postId = req.body.id 
+
+            const post = await req.prisma.post.updateMany({
+                where: {
+                    id: postId,
+                    authorId: req.user.id
+                },
+
+                data: {
+                    isDeleted: true
+                }
+            })
+
+            const comments = await req.prisma.comment.updateMany({
+                where: {
+                    postId: postId
+                },
+
+                data: {
+                    isDeleted: true
+                }
+            })
+
+            return res.json({ok: true, post})
+            
+        } catch (error) {
+
+            consoleLog('trashPost error', error)
+
+            return res.json({ok: false, error})
+
+        }
+    },
+
+    restorePost: async (req, res) => {
+        try {
+
+            const postId = req.body.id 
+
+            const post = await req.prisma.post.updateMany({
+                where: {
+                    id: postId,
+                    authorId: req.user.id
+                },
+
+                data: {
+                    isDeleted: false
+                }
+            })
+
+            const comments = await req.prisma.comment.updateMany({
+                where: {
+                    postId: postId
+                },
+
+                data: {
+                    isDeleted: false
+                }
+            })
+
+            return res.json({ok: true, post})
+            
+        } catch (error) {
+
+            consoleLog('trashPost error', error)
+
+            return res.json({ok: false, error})
+
+        }
+    },
+
+    deletePost: async (req, res) => {
+        try {
+
+            const postId = req.body.id 
+
+            const post = await req.prisma.post.deleteMany({
+                where: {
+                    id: postId,
+                    authorId: req.user.id
+                }
+            })
+
+            const comments = await req.prisma.comment.deleteMany({
+                where: {
+                    postId: postId
+                }
+            })
+
+            const likes = await req.prisma.like.deleteMany({
+                where: {
+                    postId: postId
+                }
+            })
+
+            const views = await req.prisma.postView.deleteMany({
+                where: {
+                    postId: postId
+                }
+            })
+
+            const notifications = await req.prisma.notification.deleteMany({
+                where: {
+                    postId: postId
+                }
+            })
+
+            return res.json({ok: true, post})
+            
+        } catch (error) {
+
+            consoleLog('trashPost error', error)
+
+            return res.json({ok: false, error})
+
+        }
     }
+
+    
 
 }

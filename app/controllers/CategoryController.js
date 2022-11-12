@@ -11,7 +11,14 @@ module.exports = {
                     id: true,
                     name: true,
                     slug: true,
-                    posts: true
+                    posts: {
+                        where: {
+                            status: 'published',
+                            hasPublished: true,
+                            isDeleted: false,
+                            isDeclined: false,
+                        }
+                    }
                 }
             })
     
@@ -38,7 +45,14 @@ module.exports = {
                 id: true,
                 name: true,
                 slug: true,
-                posts: true
+                posts: {
+                    where: {
+                        status: 'published',
+                        hasPublished: true,
+                        isDeleted: false,
+                        isDeclined: false,
+                    }
+                }
             }
         })
 
@@ -52,9 +66,7 @@ module.exports = {
         const categoryId = req.params.categoryId
 
         try {
-
-            console.log('categoryId', categoryId)
-
+            // console.log('categoryId', categoryId)
             const category = await req.prisma.category.findFirst({
 
                 where: {
@@ -64,7 +76,14 @@ module.exports = {
                     id: true,
                     name: true,
                     slug: true,
-                    posts: true
+                    posts: {
+                        where: {
+                            status: 'published',
+                            hasPublished: true,
+                            isDeleted: false,
+                            isDeclined: false,
+                        }
+                    }
                 }
             })
 
@@ -93,7 +112,6 @@ module.exports = {
                     { name: 'লেখাপড়া', slug: 'লেখাপড়া', isAdmin: false },
                     { name: 'বিজ্ঞান-প্রযুক্তি', slug: 'বিজ্ঞান-প্রযুক্তি', isAdmin: false },
                     { name: 'ইতিহাস', slug: 'ইতিহাস', isAdmin: false },
-                    { name: 'বই রিভিউ', slug: 'বই-রিভিউ', isAdmin: false },
                     { name: 'চিন্তাধারা', slug: 'চিন্তাধারা', isAdmin: false },
                     { name: 'সংস্কৃতি', slug: 'সংস্কৃতি', isAdmin: false },
                     { name: 'ছবি ব্লগ', slug: 'ছবি-ব্লগ', isAdmin: false },
@@ -134,6 +152,9 @@ module.exports = {
 
                 where: {
                     status: 'published',
+                    hasPublished: true,
+                    isDeleted: false,
+                    isDeclined: false,
                     categoryIDs: {
                         has: categoryId
                     }
@@ -149,13 +170,21 @@ module.exports = {
                     author: {
                         include: {
                             followers: true,
-                            posts: true
+                            posts: {
+                                where: {
+                                    status: 'published',
+                                    hasPublished: true,
+                                    isDeleted: false,
+                                    isDeclined: false,
+                                }
+                            }
                         }
                     },
                     views: true,
                     comments: {
                         where: {
-                            type: 'post'
+                            type: 'post',
+                            isDeleted: false
                         }
                     },
                     likes: true,

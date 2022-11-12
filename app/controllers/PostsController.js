@@ -4,9 +4,7 @@ const consoleLog = require("../Helpers/consoleLog")
 module.exports = {
 
     latestPost: async (req, res) => {
-
         try {
-
             // const cursor = typeof req.params.cursor === undefined || req.params.cursor === NaN ? 0 : parseInt(req.params.cursor)
             const limit = parseInt(req.query.limit)
             const cursor = parseInt(req.query.cursor)
@@ -19,7 +17,9 @@ module.exports = {
                 take: limit,
 
                 where: {
-                    status: 'published'
+                    status: 'published',
+                    isDeleted: false,
+                    isDeclined: false,
                 },
 
                 orderBy: {
@@ -31,15 +31,23 @@ module.exports = {
                     author: {
                         include: {
                             followers: true,
-                            posts: true
+                            posts: {
+                                where: {
+                                    hasPublished: true,
+                                    status: 'published',
+                                    isDeleted: false,
+                                    isDeclined: false,
+                                }
+                            }
                         }
                     },
 
                     views: true,
-                    
+
                     comments: {
                         where: {
-                            type: 'post'
+                            type: 'post',
+                            isDeleted: false,
                         }
                     },
 
@@ -58,7 +66,7 @@ module.exports = {
                     },
 
                     childs: true
-                    
+
                 }
             })
 
@@ -84,7 +92,10 @@ module.exports = {
             const posts = await req.prisma.post.findMany({
 
                 where: {
-                    status: 'published'
+                    hasPublished: true,
+                    status: 'published',
+                    isDeleted: false,
+                    isDeclined: false,
                 },
 
                 orderBy: {
@@ -133,7 +144,11 @@ module.exports = {
 
             const post = await req.prisma.post.findFirst({
                 where: {
-                    id: postId
+                    id: postId,
+                    status: 'published',
+                    hasPublished: true,
+                    isDeleted: false,
+                    isDeclined: false,
                 },
 
                 include: {
@@ -141,7 +156,10 @@ module.exports = {
                         include: {
                             posts: {
                                 where: {
-                                    status: 'published'
+                                    status: 'published',
+                                    hasPublished: true,
+                                    isDeleted: false,
+                                    isDeclined: false,
                                 },
                                 orderBy: {
                                     publishedAt: 'desc'
@@ -150,7 +168,11 @@ module.exports = {
                             followers: true
                         }
                     },
-                    comments: true,
+                    comments: {
+                        where: {
+                            isDeleted: false
+                        }
+                    },
                     views: true,
                     likes: true,
                     parent: {
@@ -811,7 +833,8 @@ module.exports = {
 
             const comments = await req.prisma.comment.findMany({
                 where: {
-                    type: 'post'
+                    type: 'post',
+                    isDeleted: false
                 },
 
                 take: limit,

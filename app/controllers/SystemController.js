@@ -11,6 +11,10 @@ module.exports = {
 
                 ? await req.prisma.post.findMany({
                     where: {
+                        hasPublished: true,
+                        status: 'published',
+                        isDeleted: false,
+                        isDeclined: false,
                         OR: [
                             {
                                 title: {
@@ -32,6 +36,8 @@ module.exports = {
 
                 && await req.prisma.user.findMany({
                     where: {
+                        isBanned: false,
+                        isNew: false,
                         fullName: {
                             contains: req.params.q,
                             mode: 'insensitive',
@@ -44,7 +50,14 @@ module.exports = {
                         displayName: true,
                         bio: true,
                         avatar: true,
-                        posts: true,
+                        posts: {
+                            where: {
+                                status: 'published',
+                                hasPublished: true,
+                                isDeleted: false,
+                                isDeclined: false,
+                            }
+                        },
                         followers: true
                     }
 
