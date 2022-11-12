@@ -63,6 +63,8 @@ model User {
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
 
+  savedPosts SavedPost[]
+
   PostViews PostView[]
 }
 
@@ -110,6 +112,8 @@ model Post {
   hasPublished Boolean @default(false)
   isDeleted Boolean? @default(false)
   isDeclined Boolean? @default(false)
+
+  savedPosts SavedPost[]
 
   publishedAt DateTime?
   createdAt   DateTime? @default(now())
@@ -225,4 +229,16 @@ model AuthorView {
   os       String?
   platform String?
   browser  String?
+}
+
+model SavedPost {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  postId String @db.ObjectId
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  createdAt   DateTime? @default(now())
 }

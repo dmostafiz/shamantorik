@@ -55,7 +55,7 @@ module.exports = {
                     getComments: {
                         take: 5,
                         where: {
-                            isDeleted: false    
+                            isDeleted: false
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -318,7 +318,7 @@ module.exports = {
                 },
 
                 orderBy: {
-                  createdAt: 'desc'
+                    createdAt: 'desc'
                 },
 
                 include: {
@@ -475,7 +475,7 @@ module.exports = {
 
             const user = req.user
 
-            if(!user?.id) return res.json({ok: false})
+            if (!user?.id) return res.json({ ok: false })
 
             const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
                 folder: 'profile_images'
@@ -489,7 +489,7 @@ module.exports = {
                 }
             })
 
-            if(!findUser) return res.json({ok: false})
+            if (!findUser) return res.json({ ok: false })
 
             const emailExists = await req.prisma.user.findFirst({
                 where: {
@@ -500,7 +500,7 @@ module.exports = {
                 }
             })
 
-            if(emailExists) return res.json({ok: false, msg: 'ইমেইলটি অন্য একজন ব্যাবহার করছেন'})
+            if (emailExists) return res.json({ ok: false, msg: 'ইমেইলটি অন্য একজন ব্যাবহার করছেন' })
 
             const updateUser = await req.prisma.user.update({
                 where: {
@@ -558,18 +558,18 @@ module.exports = {
                 }
             })
 
-            return res.json({ok: true, posts})
-            
+            return res.json({ ok: true, posts })
+
         } catch (error) {
             consoleLog('getUserStepPosts', error.message)
-            return res.json({ok: false, posts: []})
+            return res.json({ ok: false, posts: [] })
         }
     },
 
     getUserPublishedPosts: async (req, res) => {
         try {
 
-            const userId = req.user.id 
+            const userId = req.user.id
 
             const posts = await req.prisma.post.findMany({
                 where: {
@@ -578,7 +578,7 @@ module.exports = {
                     isDeleted: false,
                 },
                 orderBy: {
-                  publishedAt: 'desc'
+                    publishedAt: 'desc'
                 },
                 include: {
                     comments: true,
@@ -588,18 +588,18 @@ module.exports = {
             })
 
 
-            res.json({ok: true, posts: posts})
-            
+            res.json({ ok: true, posts: posts })
+
         } catch (error) {
             consoleLog('getUserPublishedPosts error', error)
-            res.json({ok: false, posts: []})
+            res.json({ ok: false, posts: [] })
         }
     },
 
     getUserTrashedPosts: async (req, res) => {
         try {
 
-            const userId = req.user.id 
+            const userId = req.user.id
 
             const posts = await req.prisma.post.findMany({
                 where: {
@@ -607,23 +607,23 @@ module.exports = {
                     isDeleted: true
                 },
                 orderBy: {
-                  publishedAt: 'desc'
+                    publishedAt: 'desc'
                 }
             })
 
 
-            res.json({ok: true, posts: posts})
-            
+            res.json({ ok: true, posts: posts })
+
         } catch (error) {
             consoleLog('getUserTrashedPosts error', error)
-            res.json({ok: false, posts: []})
+            res.json({ ok: false, posts: [] })
         }
     },
 
     trashPost: async (req, res) => {
         try {
 
-            const postId = req.body.id 
+            const postId = req.body.id
 
             const post = await req.prisma.post.updateMany({
                 where: {
@@ -646,13 +646,13 @@ module.exports = {
                 }
             })
 
-            return res.json({ok: true, post})
-            
+            return res.json({ ok: true, post })
+
         } catch (error) {
 
             consoleLog('trashPost error', error)
 
-            return res.json({ok: false, error})
+            return res.json({ ok: false, error })
 
         }
     },
@@ -660,7 +660,7 @@ module.exports = {
     restorePost: async (req, res) => {
         try {
 
-            const postId = req.body.id 
+            const postId = req.body.id
 
             const post = await req.prisma.post.updateMany({
                 where: {
@@ -683,13 +683,13 @@ module.exports = {
                 }
             })
 
-            return res.json({ok: true, post})
-            
+            return res.json({ ok: true, post })
+
         } catch (error) {
 
             consoleLog('trashPost error', error)
 
-            return res.json({ok: false, error})
+            return res.json({ ok: false, error })
 
         }
     },
@@ -697,7 +697,7 @@ module.exports = {
     deletePost: async (req, res) => {
         try {
 
-            const postId = req.body.id 
+            const postId = req.body.id
 
             const post = await req.prisma.post.deleteMany({
                 where: {
@@ -730,17 +730,94 @@ module.exports = {
                 }
             })
 
-            return res.json({ok: true, post})
-            
+            return res.json({ ok: true, post })
+
         } catch (error) {
 
             consoleLog('trashPost error', error)
 
-            return res.json({ok: false, error})
+            return res.json({ ok: false, error })
 
         }
-    }
+    },
 
-    
+    savePost: async (req, res) => {
+        try {
+            const userId = req.user.id
+            const id = req.body.id
+
+            const savedPost = await req.prisma.savedPost.findFirst({
+                where: {
+                    userId: userId,
+                    postId: id
+                }
+            })
+
+            if (savedPost) return res.json({ ok: false })
+
+            const save = await req.prisma.savedPost.create({
+                data: {
+                    userId: userId,
+                    postId: id
+                }
+            })
+
+            return res.json({ ok: true, save })
+
+        } catch (error) {
+            consoleLog('savePost error', error)
+            return res.json({ ok: false })
+        }
+    },
+
+    removeSavePost: async (req, res) => {
+        try {
+            const userId = req.user.id
+            const id = req.body.id
+
+            const save = await req.prisma.savedPost.deleteMany({
+                where: {
+                    userId: userId,
+                    postId: id
+                }
+            })
+
+            return res.json({ ok: true })
+
+        } catch (error) {
+            consoleLog('savePost error', error)
+            return res.json({ ok: false })
+        }
+    },
+
+    getSavedPosts: async (req, res) => {
+        try {
+            const userId = req.user.id
+
+            const savedPost = await req.prisma.savedPost.findMany({
+                where: {
+                    userId: userId
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                },
+                include: {
+                    post: {
+                        include: {
+                            author: true,
+                            comments: true,
+                            likes: true
+                        }
+                    }
+                }
+            })
+
+            return res.json({ ok: true, posts: savedPost })
+
+        } catch (error) {
+            consoleLog('savePost error', error)
+            return res.json({ ok: false })
+        }
+    },
 
 }
