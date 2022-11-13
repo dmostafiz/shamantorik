@@ -3,6 +3,30 @@ const consoleLog = require("../Helpers/consoleLog")
 
 module.exports = {
 
+    allPost: async (req, res) => {
+        try {
+            // const cursor = typeof req.params.cursor === undefined || req.params.cursor === NaN ? 0 : parseInt(req.params.cursor)
+            const limit = parseInt(req.query.limit)
+            const cursor = parseInt(req.query.cursor)
+
+            // console.log('cursor', req.query.cursor)
+
+            const posts = await req.prisma.post.findMany({
+
+                where: {
+                    status: 'published',
+                    isDeleted: false,
+                    isDeclined: false,
+                },
+            })
+
+    
+            return res.json({posts})
+
+        } catch (error) {
+            consoleLog('latest posts error', error.message)
+        }
+    }, 
     latestPost: async (req, res) => {
         try {
             // const cursor = typeof req.params.cursor === undefined || req.params.cursor === NaN ? 0 : parseInt(req.params.cursor)
