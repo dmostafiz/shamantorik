@@ -1,5 +1,5 @@
 const { Router } = require("express")
-const { checkUserExist, getAuthDraftedPosts, getBlogger, getTopBloggers, getUserNotification, seenUserNotification, seenOneNotification, getUserAccount, updateProfileInfo, getBloggerPosts, getUserStepPosts, getUserPublishedPosts, getUserTrashedPosts, trashPost, restorePost, deletePost, savePost, removeSavePost, getSavedPosts } = require("../app/controllers/UsersController")
+const { checkUserExist, getAuthDraftedPosts, getBlogger, getTopBloggers, getUserNotification, seenUserNotification, seenOneNotification, getUserAccount, updateProfileInfo, getBloggerPosts, getUserStepPosts, getUserPublishedPosts, getUserTrashedPosts, trashPost, restorePost, deletePost, savePost, removeSavePost, getSavedPosts, getTopCommenters } = require("../app/controllers/UsersController")
 const authMiddleware = require("../app/middlewares/authMiddleware")
 
 const router = Router()
@@ -43,6 +43,7 @@ router.post('/save_post', [authMiddleware], savePost)
 router.post('/remove_save_post', [authMiddleware], removeSavePost)
 router.get('/saved_posts', [authMiddleware], getSavedPosts)
 
+router.get('/top_commenters', getTopCommenters)
 
 
 router.get('/mu', async function(req, res){

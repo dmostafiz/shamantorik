@@ -820,4 +820,42 @@ module.exports = {
         }
     },
 
+    getTopCommenters: async (req, res) => {
+        try {
+
+            const users = await req.prisma.user.findMany({
+                where: {
+                    isBanned: false,
+                    isNew: false,
+                    postComments: {
+                        some: {
+                            isDeleted: false,
+                        },
+                    }
+                },
+                take: 10,
+                orderBy: {
+                    postComments: {
+                        _count: 'desc'
+                    }
+                },
+                include: {
+                    postComments: {
+                        where: {
+                            isDeleted: false
+                        }
+                    }
+                }
+            })
+
+            consoleLog('top commenters', users)
+
+            return res.json({ ok: true, users })
+
+        } catch (error) {
+            consoleLog('getTopCommenters error', error)
+            res.json({ ok: false, users: [] })
+        }
+    }
+
 }
