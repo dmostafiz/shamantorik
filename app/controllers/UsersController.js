@@ -823,6 +823,10 @@ module.exports = {
     getTopCommenters: async (req, res) => {
         try {
 
+            const date = new Date()
+
+            consoleLog('Date().getUTCDate()',date.getDate())
+
             const users = await req.prisma.user.findMany({
                 where: {
                     isBanned: false,
@@ -830,6 +834,9 @@ module.exports = {
                     postComments: {
                         some: {
                             isDeleted: false,
+                            createdAt: {
+                                gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * +date.getDate())).toISOString()
+                            },
                         },
                     }
                 },
@@ -842,13 +849,16 @@ module.exports = {
                 include: {
                     postComments: {
                         where: {
-                            isDeleted: false
+                            isDeleted: false,
+                            createdAt: {
+                                gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * +date.getDate())).toISOString()
+                            },
                         }
                     }
                 }
             })
 
-            consoleLog('top commenters', users)
+            consoleLog('top commenters', users.length)
 
             return res.json({ ok: true, users })
 
