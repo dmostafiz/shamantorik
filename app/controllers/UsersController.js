@@ -20,7 +20,6 @@ module.exports = {
         return res.json({ users, securedUser: req.user, isAdmin: req.isAdmin })
     },
 
-
     getBlogger: async (req, res) => {
 
         const userId = req.params.userId
@@ -825,7 +824,7 @@ module.exports = {
 
             const date = new Date()
 
-            consoleLog('Date().getUTCDate()',date.getDate())
+            consoleLog('Date().getUTCDate()', date.getDate())
 
             const users = await req.prisma.user.findMany({
                 where: {
@@ -866,6 +865,142 @@ module.exports = {
             consoleLog('getTopCommenters error', error)
             res.json({ ok: false, users: [] })
         }
-    }
+    },
+
+
+    getFollowings: async (req, res) => {
+        try {
+            const userId = req.user.id
+
+            const user = await req.prisma.user.findFirst({
+                where: {
+                    id: userId
+                },
+      
+                select: {
+                    followingIds: true 
+                }
+            })
+
+            return res.json({ ok: true, followings: user.followingIds })
+
+        } catch (error) {
+            consoleLog('get followings error', error)
+            return res.json({ ok: false })
+        }
+    },
+
+    getFollowers: async (req, res) => {
+        try {
+            const userId = req.user.id
+
+            const user = await req.prisma.user.findFirst({
+                where: {
+                    userId: userId
+                },
+      
+                select: {
+                    followerIds: true 
+                }
+            })
+
+            return res.json({ ok: true, followers: user.followers })
+
+        } catch (error) {
+            consoleLog('get followers error', error)
+            return res.json({ ok: false })
+        }
+    },
+
+    followUser: async (req, res) => {
+
+        try {
+
+            const follow = await req.prisma.user.update({
+                where: {
+                    id: req.body.id,
+                },
+
+                data: {
+                    followers: {
+                        connect: {
+                            id: req.user.id
+                        }
+                    },
+                }
+            })
+
+            if(!follow) return res.json({ok: false})
+
+            // consoleLog('followUser', user)
+
+            await req.prisma.user.update({
+                where: {
+                    id: req.body.id
+                },
+                data: {
+                    rank: { increment: 2 }
+                }
+            })
+
+            await req.prisma.user.update({
+                where: {
+                    id: req.user.id
+                },
+                data: {
+                    rank: { increment: 1 }
+                }
+            })
+
+            await req.prisma.notification.create({
+                data: {
+                    senderId:  req.user.id,
+                    userId: req.body.id,
+                    text: `আপনাকে অনুসরন করেছেন`,
+                    link: `/blogger/${req.user.id}`,
+                    type: 'follow',
+                    seen: false,
+                }
+            })
+
+            return res.json({ ok: true, following: follow })
+
+
+        } catch (error) {
+            consoleLog('followUser', error)
+            res.json({ ok: false })
+        }
+    },
+
+    unFollowUser: async (req, res) => {
+
+        try {
+
+            const user = await req.prisma.user.update({
+                where: {
+                    id: req.body.id,
+                },
+
+                data: {
+                    followers: {
+                        disconnect: {
+                            id: req.user.id
+                        }
+                    },
+                }
+            })
+
+            if(!user) {
+                console.log('follower already exists')
+                return res.json({ok: false})
+            }
+
+            return res.json({ ok: true, following: user })
+
+        } catch (error) {
+            consoleLog('followUser', error)
+            res.json({ ok: false })
+        }
+    },
 
 }
