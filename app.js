@@ -14,7 +14,6 @@ const { PrismaClient } = require('@prisma/client');
 const consoleLog = require('./app/Helpers/consoleLog');
 const useragent = require('express-useragent')
 
-var http = require("http");
 var socketio = require("socket.io");
 var app = express();
 

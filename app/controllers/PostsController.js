@@ -203,7 +203,7 @@ module.exports = {
                     likes: true,
                     parent: {
                         include: {
-                            childs: {
+                            children: {
                                 where: {
                                     status: 'published'
                                 }
