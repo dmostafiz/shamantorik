@@ -256,7 +256,7 @@ module.exports = {
                 include: {
                     parent: {
                         include: {
-                            childs: true
+                            children: true
                         }
                     }
                 }
