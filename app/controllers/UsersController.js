@@ -73,7 +73,6 @@ module.exports = {
                     profession: true,
                     gender: true,
                     posts: {
-
                         where: {
                             status: 'published',
                             hasPublished: true,
