@@ -1,4 +1,5 @@
 var createError = require('http-errors');
+const compression = require('compression')
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
@@ -17,6 +18,7 @@ var http = require("http");
 var socketio = require("socket.io");
 var app = express();
 
+app.use(compression())
 // Create the http server
 const server = require('http').createServer(app);
 
