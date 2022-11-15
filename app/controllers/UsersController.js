@@ -867,7 +867,6 @@ module.exports = {
         }
     },
 
-
     getFollowings: async (req, res) => {
         try {
             const userId = req.user.id
@@ -994,6 +993,15 @@ module.exports = {
                 console.log('follower already exists')
                 return res.json({ok: false})
             }
+
+            await req.prisma.user.update({
+                where: {
+                    id: req.user.id
+                },
+                data: {
+                    rank: { decrement: 1 }
+                }
+            })
 
             return res.json({ ok: true, following: user })
 
