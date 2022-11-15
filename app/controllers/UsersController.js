@@ -51,6 +51,7 @@ module.exports = {
                             post: true
                         }
                     },
+
                     getComments: {
                         take: 5,
                         where: {
@@ -72,18 +73,22 @@ module.exports = {
                     profession: true,
                     gender: true,
                     posts: {
+
                         where: {
                             status: 'published',
                             hasPublished: true,
                             isDeleted: false,
                             isDeclined: false,
                         },
+
                         orderBy: {
                             createdAt: 'desc'
                         },
+
                         include: {
                             categories: true,
                         }
+
                     }
                 }
             })
@@ -875,9 +880,9 @@ module.exports = {
                 where: {
                     id: userId
                 },
-      
+
                 select: {
-                    followingIds: true 
+                    followingIds: true
                 }
             })
 
@@ -897,9 +902,9 @@ module.exports = {
                 where: {
                     userId: userId
                 },
-      
+
                 select: {
-                    followerIds: true 
+                    followerIds: true
                 }
             })
 
@@ -929,7 +934,7 @@ module.exports = {
                 }
             })
 
-            if(!follow) return res.json({ok: false})
+            if (!follow) return res.json({ ok: false })
 
             // consoleLog('followUser', user)
 
@@ -953,7 +958,7 @@ module.exports = {
 
             await req.prisma.notification.create({
                 data: {
-                    senderId:  req.user.id,
+                    senderId: req.user.id,
                     userId: req.body.id,
                     text: `আপনাকে অনুসরন করেছেন`,
                     link: `/blogger/${req.user.id}`,
@@ -989,9 +994,9 @@ module.exports = {
                 }
             })
 
-            if(!user) {
+            if (!user) {
                 console.log('follower already exists')
-                return res.json({ok: false})
+                return res.json({ ok: false })
             }
 
             await req.prisma.user.update({

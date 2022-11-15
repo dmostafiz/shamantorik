@@ -20,13 +20,14 @@ module.exports = {
                 },
             })
 
-    
-            return res.json({posts})
+
+            return res.json({ posts })
 
         } catch (error) {
             consoleLog('latest posts error', error.message)
         }
-    }, 
+    },
+
     latestPost: async (req, res) => {
         try {
             // const cursor = typeof req.params.cursor === undefined || req.params.cursor === NaN ? 0 : parseInt(req.params.cursor)
@@ -81,16 +82,13 @@ module.exports = {
 
                     parent: {
                         include: {
-                            childs: {
+                            children: {
                                 where: {
                                     status: 'published'
                                 }
                             }
                         }
                     },
-
-                    childs: true
-
                 }
             })
 
@@ -121,7 +119,7 @@ module.exports = {
                     isDeleted: false,
                     isDeclined: false,
                 },
-                
+
                 take: limit,
 
                 orderBy: {
@@ -129,7 +127,7 @@ module.exports = {
                 },
 
                 include: {
-                    
+
                     author: {
                         include: {
                             followers: true,
