@@ -13,6 +13,7 @@ router.get('/getSinglePost/:postId', getPostById)
 router.get('/get_top_posts/:limit', getTopPost)
 
 router.post('/', [authMiddleware], createPost)
+
 router.get('/editing_post/:postId', [authMiddleware], getEditingPost)
 
 router.post('/storePostTraffic/:postId', softAuthMiddleware, storePostTraffic)
