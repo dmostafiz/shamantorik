@@ -121,26 +121,30 @@ module.exports = {
                     isDeleted: false,
                     isDeclined: false,
                 },
+                
+                take: limit,
 
                 orderBy: {
                     rank: 'desc'
                 },
 
-                take: limit,
-
                 include: {
+                    
                     author: {
                         include: {
                             followers: true,
                             posts: true
                         }
                     },
+
                     views: true,
+
                     comments: {
                         where: {
                             type: 'post'
                         }
                     },
+
                     likes: true,
                     categories: true
                 }
