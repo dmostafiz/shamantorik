@@ -21,6 +21,8 @@ model User {
   role        String  @default("user")
   posts       Post[]
 
+  serialPosts SerialPost[]
+
   postComments Comment[] @relation(name: "comentingUser")
   getComments  Comment[] @relation(name: "postAuthor")
 
@@ -82,10 +84,8 @@ model Post {
 
   part Int?
 
-  parentId String? @db.ObjectId
-  parent   Post?   @relation(name: "post", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  childs Post[] @relation("post")
+  parentId String?     @db.ObjectId
+  parent   SerialPost? @relation(name: "serial", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   title   String?
   slug    String?
@@ -109,15 +109,39 @@ model Post {
 
   rank Int @default(0)
 
-  hasPublished Boolean @default(false)
-  isDeleted Boolean? @default(false)
-  isDeclined Boolean? @default(false)
+  hasPublished Boolean  @default(false)
+  isDeleted    Boolean? @default(false)
+  isDeclined   Boolean? @default(false)
 
   savedPosts SavedPost[]
 
   publishedAt DateTime?
   createdAt   DateTime? @default(now())
   updatedAt   DateTime? @updatedAt
+}
+
+model SerialPost {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  authorId String? @db.ObjectId
+  author   User?   @relation(fields: [authorId], references: [id])
+
+  childrenIds String[] @db.ObjectId
+  children    Post[]   @relation(name: "serial")
+
+  title   String?
+  content String?
+  image   String?
+  images  String[]
+
+  categories  Category[] @relation(fields: [categoryIDs], references: [id])
+  categoryIDs String[]   @db.ObjectId
+
+  // published, paused
+  status String @default("published")
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
 model Category {
@@ -133,6 +157,9 @@ model Category {
 
   postIDs String[] @db.ObjectId
   posts   Post[]   @relation(fields: [postIDs], references: [id])
+
+  SerialPost   SerialPost[] @relation(fields: [serialPostId], references: [id])
+  serialPostId String[]     @db.ObjectId
 }
 
 model Like {
@@ -240,5 +267,5 @@ model SavedPost {
   userId String? @db.ObjectId
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  createdAt   DateTime? @default(now())
+  createdAt DateTime? @default(now())
 }
