@@ -6,9 +6,9 @@ const router = Router()
 var cacheService = require("express-api-cache");
 var cache = cacheService.cache;
 
-router.get('/all', cache('2 minute'), allPost)
+router.get('/all', cache('5 minute'), allPost)
 
-router.get('/', cache('2 minute'), latestPost)
+router.get('/', cache('5 minute'), latestPost)
 
 router.get('/getSinglePost/:postId',cache('10 minutes'), getPostById)
 
