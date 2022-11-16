@@ -10,7 +10,7 @@ router.get('/all', cache('5 minute'), allPost)
 
 router.get('/', cache('5 minute'), latestPost)
 
-router.get('/getSinglePost/:postId',cache('10 minute'), getPostById)
+router.get('/getSinglePost/:postId', getPostById)
 
 router.get('/get_top_posts/:limit',cache('1 day'), getTopPost)
 
