@@ -1,29 +1,20 @@
-const NodeCache = require('node-cache')
-const consoleLog = require('../Helpers/consoleLog')
+const responseCache = (req, res, next) => {
+    // here you can define period in second, this one is 5 minutes
+    const period = 60 * 5
 
-const cache = new NodeCache()
+    // you only want to cache for GET requests
+    if (req.method == 'GET') {
 
-module.exports = duration => (req, res, next) => {
-    if(req.method !== 'GET'){
-        consoleLog('Cannot cache', 'non-GET methods')
-        return next()
+        res.set('Cache-control', `public, max-age=${period}`)
+
+    } else {
+        // for the other requests set strict no caching parameters
+        res.set('Cache-control', `no-store`)
     }
 
-    const key = req.originalUrl
-    const cachedResponse = cache.get(key)
-
-    if(cachedResponse){
-        consoleLog('cache get for', key)
-        res.send(cachedResponse)
-    }
-    else{
-        consoleLog('cache miss for', key)
-        res.originalSend = res.send
-        res.send = body => {
-            res.originalSend(body)
-            cache.set(key, body, +duration * 1000)
-        }
-
-        next()
-    }
+    // remember to call next() to pass on the request
+    next()
 }
+
+
+module.exports = responseCache

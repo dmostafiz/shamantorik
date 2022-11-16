@@ -4,15 +4,16 @@ const authMiddleware = require("../app/middlewares/authMiddleware")
 const softAuthMiddleware = require("../app/middlewares/softAuthMiddleware")
 const router = Router()
 var cacheService = require("express-api-cache");
+const responseCache = require("../app/middlewares/cacheMiddleware")
 var cache = cacheService.cache;
 
-router.get('/all', cache('5 minute'), allPost)
+router.get('/all', allPost)
 
-router.get('/', cache('5 minute'), latestPost)
+router.get('/', [cache('5 minute'), responseCache], latestPost)
 
 router.get('/getSinglePost/:postId', getPostById)
 
-router.get('/get_top_posts/:limit',cache('1 day'), getTopPost)
+router.get('/get_top_posts/:limit',[cache('1 day'), responseCache], getTopPost)
 
 router.post('/', [authMiddleware], createPost)
 
@@ -30,7 +31,7 @@ router.post('/store_comment', [authMiddleware], storeComment)
 
 router.get('/get_post_comments/:postId', getPostComments)
 
-router.get('/latest_comments/:limit', cache('1 day'), getLatestComments)
+router.get('/latest_comments/:limit', [cache('1 day'), responseCache], getLatestComments)
 
 
 
