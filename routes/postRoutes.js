@@ -7,7 +7,10 @@ var cacheService = require("express-api-cache");
 const responseCache = require("../app/middlewares/cacheMiddleware")
 var cache = cacheService.cache;
 
+//XML sitemap
 router.get('/all', allPost)
+//XML sitemap
+
 
 router.get('/', [cache('5 minute'), responseCache], latestPost)
 

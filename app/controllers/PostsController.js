@@ -3,6 +3,7 @@ const consoleLog = require("../Helpers/consoleLog")
 
 module.exports = {
 
+    //XML sitemap
     allPost: async (req, res) => {
         try {
             // const cursor = typeof req.params.cursor === undefined || req.params.cursor === NaN ? 0 : parseInt(req.params.cursor)
@@ -27,6 +28,9 @@ module.exports = {
             consoleLog('latest posts error', error.message)
         }
     },
+    //XML sitemap
+
+
 
     latestPost: async (req, res) => {
         try {
