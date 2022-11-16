@@ -1,6 +1,8 @@
 const { Router } = require("express")
 const { checkUserExist, getAuthDraftedPosts, getBlogger, getTopBloggers, getUserNotification, seenUserNotification, seenOneNotification, getUserAccount, updateProfileInfo, getBloggerPosts, getUserStepPosts, getUserPublishedPosts, getUserTrashedPosts, trashPost, restorePost, deletePost, savePost, removeSavePost, getSavedPosts, getTopCommenters, followUser, unFollowUser, getFollowings, getFollowers } = require("../app/controllers/UsersController")
 const authMiddleware = require("../app/middlewares/authMiddleware")
+var cacheService = require("express-api-cache");
+var cache = cacheService.cache;
 
 const router = Router()
 
@@ -13,7 +15,7 @@ router.get('/blogger/:userId', getBlogger)
 
 router.get('/blogger/posts/:userId', getBloggerPosts)
 
-router.get('/get_top_ranked/:limit', getTopBloggers)
+router.get('/get_top_ranked/:limit',cache('2 days'), getTopBloggers)
 
 router.get('/author_drafted_posts', authMiddleware, getAuthDraftedPosts)
 
@@ -43,7 +45,7 @@ router.post('/save_post', [authMiddleware], savePost)
 router.post('/remove_save_post', [authMiddleware], removeSavePost)
 router.get('/saved_posts', [authMiddleware], getSavedPosts)
 
-router.get('/top_commenters', getTopCommenters)
+router.get('/top_commenters', cache('1 day'), getTopCommenters)
 
 router.post('/follow', [authMiddleware], followUser)
 router.post('/unfollow', [authMiddleware], unFollowUser)
