@@ -59,7 +59,7 @@ const addUser = (user, socketId) => {
 
 const removeUser = (socketId) => {
 
-  consoleLog('removing socket id', socketId)
+  // consoleLog('removing socket id', socketId)
 
   users = users.filter(usr => usr.socketId != socketId)
 }
@@ -67,7 +67,7 @@ const removeUser = (socketId) => {
 
 io.on('connection', socket => {
   //Take user ID and Socket ID
-  consoleLog('Socket client connected with server', '')
+  // consoleLog('Socket client connected with server', '')
 
   // When a user connect
   socket.on('addUser', (user) => {
@@ -104,7 +104,7 @@ io.on('connection', socket => {
   // When a user disconnect
   socket.on('disconnect', () => {
 
-    console.log('Socket client disconnected from server')
+    // console.log('Socket client disconnected from server')
 
      removeUser(socket.id)
 

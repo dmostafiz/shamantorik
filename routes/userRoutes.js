@@ -15,7 +15,7 @@ router.get('/blogger/:userId', getBlogger)
 
 router.get('/blogger/posts/:userId', getBloggerPosts)
 
-router.get('/get_top_ranked/:limit',cache('2 days'), getTopBloggers)
+router.get('/get_top_ranked/:limit',cache('2 day'), getTopBloggers)
 
 router.get('/author_drafted_posts', authMiddleware, getAuthDraftedPosts)
 
