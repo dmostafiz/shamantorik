@@ -603,11 +603,8 @@ module.exports = {
         try {
 
             // consoleLog('Req image', req.body)
-
-            if(!req?.user?.id) return res.json({ok:false})
-
             const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
-                folder: `post_images/${req?.user?.id}`,
+                folder: `post_images`,
                 format: 'webp',
                 width: 500, 
                 height: 300,
