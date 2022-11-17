@@ -290,8 +290,11 @@ module.exports = {
             // };
 
             const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
-                folder: 'profile_images',
+                folder: `post_images/${req?.user?.id}`,
                 format: 'webp',
+                width: 500, 
+                height: 300,
+                crop: "fill",
                 quality: 75
             }) : null
 
@@ -601,10 +604,15 @@ module.exports = {
 
             // consoleLog('Req image', req.body)
 
+            if(!req?.user?.id) return res.json({ok:false})
+
             const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
-                folder: 'post_image',
+                folder: `post_images/${req?.user?.id}`,
                 format: 'webp',
-                quality: 70
+                width: 500, 
+                height: 300,
+                crop: "fill",
+                quality: 75
             }) : null
 
             consoleLog('imageUploadResult', imageUploadResult)
