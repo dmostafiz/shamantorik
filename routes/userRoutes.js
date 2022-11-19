@@ -41,7 +41,7 @@ router.post('/save_post', [authMiddleware], savePost)
 router.post('/remove_save_post', [authMiddleware], removeSavePost)
 router.get('/saved_posts', [authMiddleware], getSavedPosts)
 
-router.get('/top_commenters', [cache('1 day'), responseCache], getTopCommenters)
+router.get('/top_commenters', getTopCommenters)
 
 router.post('/follow', [authMiddleware], followUser)
 router.post('/unfollow', [authMiddleware], unFollowUser)

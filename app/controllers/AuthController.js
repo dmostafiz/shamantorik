@@ -280,7 +280,7 @@ module.exports = {
                 },
 
                 data: {
-                    avatar: imageUploadResult?.url,
+                    avatar: imageUploadResult?.secure_url,
                     fullName: req.body.fullName,
                     displayName: req.body.fullName,
                     gender: req.body.gender,

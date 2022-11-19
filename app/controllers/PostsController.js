@@ -334,7 +334,7 @@ module.exports = {
                     title: req?.body?.title,
                     slug: null,
                     content: req?.body?.content,
-                    image: imageUploadResult?.url,
+                    image: imageUploadResult?.secure_url,
                     postType: req?.body?.postType,
                     part: req?.body?.part,
                     categories: {
@@ -614,7 +614,7 @@ module.exports = {
 
             consoleLog('imageUploadResult', imageUploadResult)
 
-            res.json({ location: imageUploadResult?.url })
+            res.json({ location: imageUploadResult?.secure_url })
 
         } catch (error) {
             consoleLog('image upload error!', error.message)

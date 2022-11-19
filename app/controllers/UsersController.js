@@ -42,7 +42,7 @@ module.exports = {
                     followers: true,
                     followings: true,
                     postComments: {
-                        take: 5,
+                        // take: 5,
                         orderBy: {
                             createdAt: 'desc'
                         },
@@ -57,7 +57,7 @@ module.exports = {
                     },
 
                     getComments: {
-                        take: 5,
+                        // take: 5,
                         where: {
                             isDeleted: false,
                             type: 'post'
@@ -516,7 +516,7 @@ module.exports = {
                 },
 
                 data: {
-                    avatar: imageUploadResult?.url || findUser.avatar,
+                    avatar: imageUploadResult?.secure_url || findUser.avatar,
                     fullName: req.body.fullName,
                     displayName: req.body.displayName,
                     email: req.body.email,
@@ -844,31 +844,34 @@ module.exports = {
                             isDeleted: false,
                             type: 'post',
                             createdAt: {
-                                gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * +date.getDate())).toISOString()
+                                gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * date.getDate())).toISOString()
                             },
                         },
                     }
                 },
+
                 take: 10,
+
                 orderBy: {
                     postComments: {
                         _count: 'desc'
                     }
                 },
+
                 include: {
                     postComments: {
                         where: {
                             isDeleted: false,
                             type: 'post',
                             createdAt: {
-                                gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * +date.getDate())).toISOString()
+                                gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * date.getDate())).toISOString()
                             },
                         }
                     }
                 }
             })
 
-            consoleLog('top commenters', users.length)
+            // consoleLog('top commenters', users.length)
 
             return res.json({ ok: true, users })
 
