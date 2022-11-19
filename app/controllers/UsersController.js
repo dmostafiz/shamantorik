@@ -46,6 +46,10 @@ module.exports = {
                         orderBy: {
                             createdAt: 'desc'
                         },
+                        where: {
+                            isDeleted: false,
+                            type: 'post'
+                        },
                         include: {
                             author: true,
                             post: true
@@ -55,7 +59,8 @@ module.exports = {
                     getComments: {
                         take: 5,
                         where: {
-                            isDeleted: false
+                            isDeleted: false,
+                            type: 'post'
                         },
                         orderBy: {
                             createdAt: 'desc'
@@ -853,6 +858,7 @@ module.exports = {
                     postComments: {
                         where: {
                             isDeleted: false,
+                            type: 'post',
                             createdAt: {
                                 gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * +date.getDate())).toISOString()
                             },
