@@ -842,6 +842,7 @@ module.exports = {
                     postComments: {
                         some: {
                             isDeleted: false,
+                            type: 'post',
                             createdAt: {
                                 gte: new Date(Date.now() - ((24 * 60 * 60 * 1000) * +date.getDate())).toISOString()
                             },
