@@ -868,7 +868,7 @@ module.exports = {
                             },
                         }
                     }
-                }
+                },
             })
 
             // consoleLog('top commenters', users.length)

@@ -135,7 +135,14 @@ module.exports = {
                     author: {
                         include: {
                             followers: true,
-                            posts: true
+                            posts: {
+                                where: {
+                                    hasPublished: true,
+                                    status: 'published',
+                                    isDeleted: false,
+                                    isDeclined: false,
+                                }
+                            }
                         }
                     },
 
@@ -292,7 +299,7 @@ module.exports = {
             const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
                 folder: `post_images/${req?.user?.id}`,
                 format: 'webp',
-                width: 500, 
+                width: 500,
                 height: 300,
                 crop: "fill",
                 quality: 75
@@ -606,7 +613,7 @@ module.exports = {
             const imageUploadResult = req.body.image ? await Cloudinary.uploader.upload(req.body.image, {
                 folder: `post_images`,
                 format: 'webp',
-                width: 500, 
+                width: 500,
                 height: 300,
                 crop: "fill",
                 quality: 75
@@ -814,8 +821,16 @@ module.exports = {
                                     displayName: true,
                                     avatar: true,
                                     createdAt: true,
-                                    updatedAt: true
-
+                                    updatedAt: true,
+                                    bio: true,
+                                    followers: true,
+                                    posts: {
+                                        where: {
+                                            status: 'published',
+                                            isDeleted: false,
+                                            isDeclined: false,
+                                        },
+                                    }
                                 }
                             },
 
@@ -834,9 +849,18 @@ module.exports = {
                                             displayName: true,
                                             avatar: true,
                                             createdAt: true,
-                                            updatedAt: true
+                                            updatedAt: true,
+                                            bio: true,
+                                            followers: true,
+                                            posts: {
+                                                where: {
+                                                    status: 'published',
+                                                    isDeleted: false,
+                                                    isDeclined: false,
+                                                },
+                                            }
+                                        },
 
-                                        }
                                     }
                                 }
                             },
@@ -849,7 +873,16 @@ module.exports = {
                             displayName: true,
                             avatar: true,
                             createdAt: true,
-                            updatedAt: true
+                            updatedAt: true,
+                            bio: true,
+                            followers: true,
+                            posts: {
+                                where: {
+                                    status: 'published',
+                                    isDeleted: false,
+                                    isDeclined: false,
+                                },
+                            }
                         }
                     }
                 }
