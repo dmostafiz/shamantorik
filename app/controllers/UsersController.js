@@ -852,12 +852,6 @@ module.exports = {
 
                 take: 10,
 
-                orderBy: {
-                    postComments: {
-                        _count: 'desc'
-                    }
-                },
-
                 include: {
                     postComments: {
                         where: {
@@ -869,9 +863,27 @@ module.exports = {
                         }
                     }
                 },
+
+                orderBy: {
+                    postComments: {
+                        _count: 'desc'
+                    }
+                },
             })
 
-            // consoleLog('top commenters', users.length)
+            // const commenter = await prisma.comment.groupBy({
+            //     by: ['author'],
+            //     _count: {
+            //       city: true,
+            //     },
+            //     orderBy: {
+            //       _count: {
+            //         city: 'desc',
+            //       },
+            //     },
+            //   })
+
+            // consoleLog('top commenters: ', commenter)
 
             return res.json({ ok: true, users })
 

@@ -5,7 +5,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const cors = require('cors');
-const session = require('cookie-session')
+// const session = require('cookie-session')
 const helmet = require('helmet')
 // var indexRouter = require('./routes/index');
 require("dotenv").config()
@@ -114,18 +114,18 @@ app.use(cors({
 
 const expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 
-app.use(session({
-  name: 'sessionId',
-  secret: process.env.REFRESH_TOKEN_SECRET,
-  // keys: ['key1', 'key2'],
-  cookie: {
-    secure: true,
-    httpOnly: true,
-    // domain: 'example.com',
-    // path: 'foo/bar',
-    expires: expiryDate
-  }
-}))
+// app.use(session({
+//   name: 'sessionId',
+//   secret: process.env.REFRESH_TOKEN_SECRET,
+//   // keys: ['key1', 'key2'],
+//   cookie: {
+//     secure: true,
+//     httpOnly: true,
+//     // domain: 'example.com',
+//     // path: 'foo/bar',
+//     expires: expiryDate
+//   }
+// }))
 
 
 // view engine setup
