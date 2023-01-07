@@ -864,28 +864,16 @@ module.exports = {
                     }
                 },
 
-                orderBy: {
-                    postComments: {
-                        _count: 'desc'
-                    }
-                },
             })
 
-            // const commenter = await prisma.comment.groupBy({
-            //     by: ['author'],
-            //     _count: {
-            //       city: true,
-            //     },
-            //     orderBy: {
-            //       _count: {
-            //         city: 'desc',
-            //       },
-            //     },
-            //   })
+      
+            const topCommenters = users.sort((a, b) => {
+                return +b?.postComments?.length - +a?.postComments?.length
+            })
 
-            // consoleLog('top commenters: ', commenter)
+            console.log('topCommenters', topCommenters)
 
-            return res.json({ ok: true, users })
+            return res.json({ ok: true, users:topCommenters })
 
         } catch (error) {
             consoleLog('getTopCommenters error', error)
