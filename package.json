@@ -28,6 +28,7 @@
     "memory-cache": "^0.2.0",
     "morgan": "~1.9.1",
     "node-cache": "^5.1.2",
+    "node-cron": "^3.0.2",
     "slugify": "^1.6.5",
     "socket.io": "^4.5.3"
   },

@@ -13,9 +13,15 @@ require("dotenv").config()
 const { PrismaClient } = require('@prisma/client');
 const consoleLog = require('./app/Helpers/consoleLog');
 const useragent = require('express-useragent')
+var cron = require('node-cron');
 
 var socketio = require("socket.io");
 var app = express();
+
+
+cron.schedule('*/10 * * * *', () => {
+  console.log('running a task');
+});
 
 app.use(compression())
 
